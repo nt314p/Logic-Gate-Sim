@@ -5,14 +5,38 @@ using UnityEngine;
 public class Wire : MonoBehaviour {
 
     private Vector2Int startPoint;
-    private int length;
-    private bool vertical;
+    private Vector2Int endPoint;
     private SpriteRenderer sr;
-    public void Initialize (Vector2Int start, int length, bool vertical) {
-        startPoint = start;
-        this.length = length;
-        this.vertical = vertical;
+
+    void Start () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
+    }
+
+    void OnMouseDown () {
+        sr.color = Color.white;
+        sr.sortingOrder = 1;
+    }
+
+    void OnMouseUp () {
+        sr.color = new Color (0.7f, 0.7f, 0.7f);
+        sr.sortingOrder = 0;
+    }
+
+    public void Initialize (Vector2Int start, Vector2Int end) {
+        bool vertical = false;
+        if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x)) {
+            Vector2Int tmp = start; // swapping if start is not the min value
+            start = end;
+            end = tmp;
+        }
+
+        startPoint = start;
+        endPoint = end;
+
+        if (start.x == end.x) {
+            vertical = true;
+        }
+
         if (vertical) {
             this.transform.localScale = new Vector3 (1, 10, 1);
             this.transform.position = new Vector3 (startPoint.x, startPoint.y + 0.5f, -0.01f);
@@ -21,25 +45,6 @@ public class Wire : MonoBehaviour {
             this.transform.localScale = new Vector3 (10, 1, 1);
             this.transform.position = new Vector3 (startPoint.x + 0.5f, startPoint.y, -0.01f);
         }
-    }
-
-    public void Initialize (Vector2Int start, Vector2Int end) {
-        int len = 0;
-        bool vert = false;
-        if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x)) { 
-            Vector2Int tmp = start; // swapping if start is not the min value
-            start = end;
-            end = tmp;
-        }
-        if (start.x == end.x) {
-            vert = true;
-        }
-        if (vertical) {
-            len = Mathf.Abs (start.y - end.y);
-        } else {
-            len = Mathf.Abs (start.x - end.x);
-        }
-        Initialize(start, len, vert);
     }
 
 }
