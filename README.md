@@ -1,4 +1,4 @@
-t Logic-Gate-Sim
+# Logic-Gate-Sim
 Build, simulate, and abstract your logic gate circuits by including designs within other designs!
 
 This is a simple program where you can drag and drop components onto a grid.
