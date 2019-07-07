@@ -6,7 +6,9 @@ public class Wire : MonoBehaviour {
 
     private Vector2Int startPoint;
     private Vector2Int endPoint;
+    private bool vertical;
     private SpriteRenderer sr;
+    private int id;
 
     void Start () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
@@ -15,6 +17,7 @@ public class Wire : MonoBehaviour {
     void OnMouseDown () {
         sr.color = Color.white;
         sr.sortingOrder = 1;
+        Debug.Log ("ID: " + id);
     }
 
     void OnMouseUp () {
@@ -22,8 +25,10 @@ public class Wire : MonoBehaviour {
         sr.sortingOrder = 0;
     }
 
-    public void Initialize (Vector2Int start, Vector2Int end) {
-        bool vertical = false;
+    public void Initialize (Vector2Int start, Vector2Int end, int id) {
+        this.id = id;
+        vertical = false;
+
         if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x)) {
             Vector2Int tmp = start; // swapping if start is not the min value
             start = end;
@@ -35,16 +40,36 @@ public class Wire : MonoBehaviour {
 
         if (start.x == end.x) {
             vertical = true;
-        }
-
-        if (vertical) {
             this.transform.localScale = new Vector3 (1, 10, 1);
             this.transform.position = new Vector3 (startPoint.x, startPoint.y + 0.5f, -0.01f);
-        }
-        if (!vertical) {
+        } else {
             this.transform.localScale = new Vector3 (10, 1, 1);
             this.transform.position = new Vector3 (startPoint.x + 0.5f, startPoint.y, -0.01f);
         }
+    }
+
+    public void Initialize (Vector2Int start, Vector2Int end) {
+        Initialize (start, end, -1);
+    }
+
+    public Vector2Int GetStartPoint () {
+        return startPoint;
+    }
+
+    public void SetId (int id) {
+        this.id = id;
+    }
+
+    public int GetId () {
+        return id;
+    }
+
+    public bool IsVertical () {
+        return vertical;
+    }
+
+    public bool Equals (Wire w) {
+        return startPoint.Equals (w.startPoint) && endPoint.Equals (w.endPoint);
     }
 
 }
