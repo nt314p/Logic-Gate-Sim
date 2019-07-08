@@ -20,6 +20,10 @@ public class WireWrapper {
         return right;
     }
 
+    public Wire[] GetWires() {
+        return new Wire[]{top, right};
+    }
+
     public void SetTop (Wire top) {
         this.top = top;
     }
