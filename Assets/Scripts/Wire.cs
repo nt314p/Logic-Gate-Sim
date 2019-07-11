@@ -12,16 +12,17 @@ public class Wire : MonoBehaviour {
 
     void Start () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
+        sr.color = new Color (0f, 0.65f, 0.075f);
     }
 
     void OnMouseDown () {
-        sr.color = Color.white;
+        sr.color = new Color (0f, 0.79f, 0.09f);
         sr.sortingOrder = 1;
         Debug.Log ("ID: " + id);
     }
 
     void OnMouseUp () {
-        sr.color = new Color (0.7f, 0.7f, 0.7f);
+        sr.color = new Color (0f, 0.65f, 0.075f);
         sr.sortingOrder = 0;
     }
 
@@ -40,10 +41,10 @@ public class Wire : MonoBehaviour {
 
         if (start.x == end.x) {
             vertical = true;
-            this.transform.localScale = new Vector3 (1, 10, 1);
+            this.transform.localScale = new Vector3 (1.38f, 13.8f, 1);
             this.transform.position = new Vector3 (startPoint.x, startPoint.y + 0.5f, -0.01f);
         } else {
-            this.transform.localScale = new Vector3 (10, 1, 1);
+            this.transform.localScale = new Vector3 (13.8f, 1.38f, 1);
             this.transform.position = new Vector3 (startPoint.x + 0.5f, startPoint.y, -0.01f);
         }
     }
