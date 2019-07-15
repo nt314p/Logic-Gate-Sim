@@ -1,15 +1,18 @@
-public class WireWrapper {
+public class ComponenetWrapper {
 
     private Wire top, right;
+    private Component node;
 
-    public WireWrapper(Wire top, Wire right) {
+    public ComponenetWrapper (Wire top, Wire right, Component node) {
         this.top = top;
         this.right = right;
+        this.node = node;
     }
 
-    public WireWrapper() {
+    public ComponenetWrapper () {
         this.top = null;
         this.right = null;
+        this.node = null;
     }
 
     public Wire GetTop () {
@@ -20,8 +23,8 @@ public class WireWrapper {
         return right;
     }
 
-    public Wire[] GetWires() {
-        return new Wire[]{top, right};
+    public Wire[] GetWires () {
+        return new Wire[] { top, right };
     }
 
     public void SetTop (Wire top) {

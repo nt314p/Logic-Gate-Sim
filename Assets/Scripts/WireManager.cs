@@ -5,7 +5,7 @@ using UnityEngine;
 public class WireManager : MonoBehaviour {
 
     public GameObject wire;
-    private WireWrapper[, ] masterGrid;
+    private ComponenetWrapper[, ] masterGrid;
     private int nextId;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
@@ -14,10 +14,10 @@ public class WireManager : MonoBehaviour {
     void Start () {
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
-        masterGrid = new WireWrapper[50, 50];
+        masterGrid = new ComponenetWrapper[50, 50];
         for (int i = 0; i < masterGrid.GetLength (0); i++) {
             for (int j = 0; j < masterGrid.GetLength (1); j++) {
-                masterGrid[i, j] = new WireWrapper ();
+                masterGrid[i, j] = new ComponenetWrapper ();
             }
         }
         nextId = 0;
@@ -131,6 +131,13 @@ public class WireManager : MonoBehaviour {
             }
         }
         return ret;
+    }
+
+    public void SetAllOfId (int id, bool state) {
+        List<Wire> temp = GetAllOfId(id);
+        foreach (Wire w in temp) {
+            w.SetState(state);
+        }
     }
 
     private Vector3 ToVector3 (Vector2Int vec) {
