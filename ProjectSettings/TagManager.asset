@@ -14,7 +14,7 @@ TagManager:
   - 
   - 
   - WireLayer
-  - 
+  - ComponentLayer
   - 
   - 
   - 
@@ -43,4 +43,7 @@ TagManager:
     locked: 0
   - name: WireLayer
     uniqueID: 2988657189
+    locked: 0
+  - name: ComponentLayer
+    uniqueID: 1616857015
     locked: 0

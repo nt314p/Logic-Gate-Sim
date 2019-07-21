@@ -23,6 +23,10 @@ public class ComponenetWrapper {
         return right;
     }
 
+    public Component GetNode () {
+        return node;
+    }
+
     public Wire[] GetWires () {
         return new Wire[] { top, right };
     }
@@ -33,6 +37,10 @@ public class ComponenetWrapper {
 
     public void SetRight (Wire right) {
         this.right = right;
+    }
+
+    public void SetNode (Component node) {
+        this.node = node;
     }
 
 }

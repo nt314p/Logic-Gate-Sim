@@ -7,23 +7,21 @@ public class Wire : Component {
     private Vector2Int startPoint;
     private Vector2Int endPoint;
     private bool vertical;
-    private bool state;
     private SpriteRenderer sr;
 
     void Start () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
-        state = false;
-        UpdateColor();
+        SetState (false);
+        UpdateColor ();
     }
 
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
-            SetState (!state);
-            FindObjectOfType<WireManager>().SetAllOfId(GetId(), state);
+            SetState (!GetState ());
+            FindObjectOfType<WireManager> ().SetAllOfId (GetId (), GetState ());
         }
         sr.color = new Color (0.67f, 0.89f, 0f);
         sr.sortingOrder = 1;
-        Debug.Log ("ID: " + GetId () + ", STATE: " + state);
     }
 
     void OnMouseUp () {
@@ -58,17 +56,12 @@ public class Wire : Component {
         Initialize (start, end, -1);
     }
 
-    public void SetState (bool state) {
-        this.state = state;
+    public override void OnStateUpdate () {
         UpdateColor ();
     }
 
-    public bool GetState () {
-        return state;
-    }
-
     public void UpdateColor () {
-        if (state) {
+        if (GetState ()) {
             sr.color = new Color (0f, 0.79f, 0.09f);
         } else {
             sr.color = new Color (0f, 0.494f, 0.0588f);

@@ -5,6 +5,7 @@ using UnityEngine;
 public class WireManager : MonoBehaviour {
 
     public GameObject wire;
+    public GameObject LED;
     private ComponenetWrapper[, ] masterGrid;
     private int nextId;
     private List<GameObject> wiresInPath;
@@ -67,6 +68,17 @@ public class WireManager : MonoBehaviour {
             }
             wiresInPath = new List<GameObject> ();
             wirePath = new List<Vector2Int> ();
+        }
+    }
+
+    void OnMouseDown () {
+        if (Input.GetKey(KeyCode.L)) {
+            Vector3 temp = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+            Vector2Int coord = new Vector2Int (Mathf.RoundToInt (temp.x), Mathf.RoundToInt (temp.y));
+            GameObject tempLED = Instantiate (LED, ToVector3(coord), Quaternion.identity);
+            LED led = tempLED.GetComponent<LED>();
+            led.
+            masterGrid[coord.x, coord.y].SetNode(led);
         }
     }
 
@@ -152,6 +164,7 @@ public class WireManager : MonoBehaviour {
     }
 
     private void AddToMasterGrid (Wire w) {
+        if (w == null) return;
         Vector2Int coord = w.GetStartPoint ();
         if (w.IsVertical ()) {
             masterGrid[coord.x, coord.y].SetTop (w);

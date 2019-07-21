@@ -7,7 +7,7 @@ public class CameraController : MonoBehaviour {
     private float zoom;
     private readonly float zoomScale = 0.5f;
     private readonly float initZoom = 10;
-    private readonly float minZoom = 2;
+    private readonly float minZoom = 1.5f;
     private readonly float maxZoom = 15;
     private Vector3 targetPos;
     private Vector3 dragOrigin, oldPos;
