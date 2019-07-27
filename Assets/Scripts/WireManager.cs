@@ -10,6 +10,8 @@ public class WireManager : MonoBehaviour {
     private int nextId;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
+    private bool drawingWirePath;
+    private string selectedComponent;
 
     // Start is called before the first frame update
     void Start () {
@@ -22,37 +24,62 @@ public class WireManager : MonoBehaviour {
             }
         }
         nextId = 0;
+        drawingWirePath = false;
+        selectedComponent = "";
 
         Recalculate ();
     }
 
     // Update is called once per frame
     void Update () {
+        if (Input.GetKey(KeyCode.W)) {
+            selectedComponent = "wire";
+        } else if (Input.GetKey(KeyCode.L)) {
+            selectedComponent = "led";
+        } else {
+            selectedComponent = "";
+        }
+
+        // Debug.Log(selectedComponent);
 
         Vector3 temp = Camera.main.ScreenToWorldPoint (Input.mousePosition);
         Vector2Int coord = new Vector2Int (Mathf.RoundToInt (temp.x), Mathf.RoundToInt (temp.y));
 
         if (Input.GetMouseButtonDown (0)) {
-            if (IsWithinBounds (coord)) {
-                wirePath.Add (coord);
-            }
-        } else if (Input.GetMouseButton (0)) {
-            Vector2Int prevCoord = wirePath[wirePath.Count - 1];
+            switch (selectedComponent) {
+                case "wire":
+                    if (IsWithinBounds (coord)) {
+                        wirePath.Add (coord);
+                        drawingWirePath = true;
+                    }
+                    break;
+                case "led":
+                    CreateLED(coord);
+                    break;
+                default:
+                    break;
 
-            // coordinate is unique and in grid bounds
-            if (!(coord.Equals (prevCoord)) && IsWithinBounds (coord)) {
-                if (wirePath.Count >= 2 && wirePath[wirePath.Count - 2] == coord) {
-                    Destroy (wiresInPath[wiresInPath.Count - 1]);
-                    wirePath.RemoveAt (wirePath.Count - 1);
-                    wiresInPath.RemoveAt (wiresInPath.Count - 1);
-                } else {
-                    List<Vector2Int> interpolated = Interpolate (prevCoord, coord);
-                    for (int i = 0; i < interpolated.Count; i++) {
-                        wirePath.Add (interpolated[i]);
-                        Vector2Int start = wirePath[wirePath.Count - 2];
-                        Vector2Int end = wirePath[wirePath.Count - 1];
-                        wiresInPath.Add (Instantiate (wire, ToVector3 (start), Quaternion.identity));
-                        wiresInPath[wiresInPath.Count - 1].GetComponent<Wire> ().Initialize (start, end, nextId);
+            }
+
+        } else if (Input.GetMouseButton (0)) {
+            if (drawingWirePath) {
+                Vector2Int prevCoord = wirePath[wirePath.Count - 1];
+
+                // coordinate is unique and in grid bounds
+                if (!(coord.Equals (prevCoord)) && IsWithinBounds (coord)) {
+                    if (wirePath.Count >= 2 && wirePath[wirePath.Count - 2] == coord) {
+                        Destroy (wiresInPath[wiresInPath.Count - 1]);
+                        wirePath.RemoveAt (wirePath.Count - 1);
+                        wiresInPath.RemoveAt (wiresInPath.Count - 1);
+                    } else {
+                        List<Vector2Int> interpolated = Interpolate (prevCoord, coord);
+                        for (int i = 0; i < interpolated.Count; i++) {
+                            wirePath.Add (interpolated[i]);
+                            Vector2Int start = wirePath[wirePath.Count - 2];
+                            Vector2Int end = wirePath[wirePath.Count - 1];
+                            wiresInPath.Add (Instantiate (wire, ToVector3 (start), Quaternion.identity));
+                            wiresInPath[wiresInPath.Count - 1].GetComponent<Wire> ().Initialize (start, end, nextId);
+                        }
                     }
                 }
             }
@@ -68,18 +95,15 @@ public class WireManager : MonoBehaviour {
             }
             wiresInPath = new List<GameObject> ();
             wirePath = new List<Vector2Int> ();
+            drawingWirePath = false;
         }
     }
 
-    void OnMouseDown () {
-        if (Input.GetKey(KeyCode.L)) {
-            Vector3 temp = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-            Vector2Int coord = new Vector2Int (Mathf.RoundToInt (temp.x), Mathf.RoundToInt (temp.y));
-            GameObject tempLED = Instantiate (LED, ToVector3(coord), Quaternion.identity);
-            LED led = tempLED.GetComponent<LED>();
-            led.
-            masterGrid[coord.x, coord.y].SetNode(led);
-        }
+    private void CreateLED (Vector2Int coord) {
+        GameObject tempLED = Instantiate (LED, ToVector3 (coord), Quaternion.identity);
+        LED led = tempLED.GetComponent<LED> ();
+        led.Initialize();
+        masterGrid[coord.x, coord.y].SetNode (led);
     }
 
     private void Recalculate () {
@@ -146,10 +170,14 @@ public class WireManager : MonoBehaviour {
     }
 
     public void SetAllOfId (int id, bool state) {
-        List<Wire> temp = GetAllOfId(id);
+        List<Wire> temp = GetAllOfId (id);
         foreach (Wire w in temp) {
-            w.SetState(state);
+            w.SetState (state);
         }
+    }
+
+    public string GetSelectedComponent() {
+        return selectedComponent;
     }
 
     private Vector3 ToVector3 (Vector2Int vec) {

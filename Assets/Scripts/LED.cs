@@ -8,6 +8,7 @@ public class LED : Component {
 
     // Start is called before the first frame update
     void Start () {
+        SetId(-1);
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
         SetState (false);
         UpdateColor ();
@@ -16,6 +17,10 @@ public class LED : Component {
     // Update is called once per frame
     void Update () {
 
+    }
+
+    public void Initialize() {
+        transform.position = new Vector3(transform.position.x, transform.position.y, -0.01f);
     }
 
     public void UpdateColor () {
@@ -28,16 +33,14 @@ public class LED : Component {
 
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
+            Debug.Log("CTRL CLICKED!");
             SetState (!GetState ());
-            FindObjectOfType<WireManager> ().SetAllOfId (GetId (), GetState ());
         }
         sr.color = new Color (0.67f, 0.89f, 0f);
-        sr.sortingOrder = 1;
     }
 
     void OnMouseUp () {
         UpdateColor ();
-        sr.sortingOrder = 0;
     }
 
     public override void OnStateUpdate () {
