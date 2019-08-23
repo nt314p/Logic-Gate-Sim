@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LED : Component {
+public class LED : Part {
 
     private SpriteRenderer sr;
 

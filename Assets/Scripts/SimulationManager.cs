@@ -2,51 +2,44 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WireManager : MonoBehaviour {
+public class SimulationManager : MonoBehaviour {
 
     public GameObject wire;
     public GameObject LED;
-    private ComponenetWrapper[, ] masterGrid;
-    private int nextId;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
     private bool drawingWirePath;
-    private string selectedComponent;
+    private string selectedPart;
+    private Circuit currentCircuit;
 
     // Start is called before the first frame update
     void Start () {
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
-        masterGrid = new ComponenetWrapper[50, 50];
-        for (int i = 0; i < masterGrid.GetLength (0); i++) {
-            for (int j = 0; j < masterGrid.GetLength (1); j++) {
-                masterGrid[i, j] = new ComponenetWrapper ();
-            }
-        }
-        nextId = 0;
+        currentCircuit.Initialize (50, 50);
         drawingWirePath = false;
-        selectedComponent = "";
+        selectedPart = "";
 
-        Recalculate ();
+        currentCircuit.Recalculate ();
     }
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetKey(KeyCode.W)) {
-            selectedComponent = "wire";
-        } else if (Input.GetKey(KeyCode.L)) {
-            selectedComponent = "led";
+        if (Input.GetKey (KeyCode.W)) {
+            selectedPart = "wire";
+        } else if (Input.GetKey (KeyCode.L)) {
+            selectedPart = "led";
         } else {
-            selectedComponent = "";
+            selectedPart = "";
         }
 
-        // Debug.Log(selectedComponent);
+        // Debug.Log(selectedPart);
 
         Vector3 temp = Camera.main.ScreenToWorldPoint (Input.mousePosition);
         Vector2Int coord = new Vector2Int (Mathf.RoundToInt (temp.x), Mathf.RoundToInt (temp.y));
 
         if (Input.GetMouseButtonDown (0)) {
-            switch (selectedComponent) {
+            switch (selectedPart) {
                 case "wire":
                     if (IsWithinBounds (coord)) {
                         wirePath.Add (coord);
@@ -54,7 +47,7 @@ public class WireManager : MonoBehaviour {
                     }
                     break;
                 case "led":
-                    CreateLED(coord);
+                    CreateLED (coord);
                     break;
                 default:
                     break;
@@ -78,7 +71,7 @@ public class WireManager : MonoBehaviour {
                             Vector2Int start = wirePath[wirePath.Count - 2];
                             Vector2Int end = wirePath[wirePath.Count - 1];
                             wiresInPath.Add (Instantiate (wire, ToVector3 (start), Quaternion.identity));
-                            wiresInPath[wiresInPath.Count - 1].GetComponent<Wire> ().Initialize (start, end, nextId);
+                            wiresInPath[wiresInPath.Count - 1].GetComponent<Wire> ().Initialize (start, end);
                         }
                     }
                 }
@@ -86,13 +79,13 @@ public class WireManager : MonoBehaviour {
         }
 
         if (Input.GetMouseButtonUp (0)) {
+            List<Wire> wireList = new List<Wire> ();
             for (int i = 0; i < wiresInPath.Count; i++) {
-                AddToMasterGrid (wiresInPath[i].GetComponent<Wire> ());
+                wireList.Add (wiresInPath[i].GetComponent<Wire> ());
             }
-            if (wiresInPath.Count > 0) {
-                nextId++;
-                Recalculate ();
-            }
+
+            currentCircuit.AddWires (wireList);
+
             wiresInPath = new List<GameObject> ();
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;
@@ -102,82 +95,12 @@ public class WireManager : MonoBehaviour {
     private void CreateLED (Vector2Int coord) {
         GameObject tempLED = Instantiate (LED, ToVector3 (coord), Quaternion.identity);
         LED led = tempLED.GetComponent<LED> ();
-        led.Initialize();
+        led.Initialize ();
         masterGrid[coord.x, coord.y].SetNode (led);
     }
 
-    private void Recalculate () {
-        nextId = 0;
-        for (int i = 0; i < masterGrid.GetLength (0); i++) { // clearing ids
-            for (int j = 0; j < masterGrid.GetLength (1); j++) {
-                for (int k = 0; k < 2; k++) {
-                    if (masterGrid[i, j].GetWires () [k] != null) {
-                        masterGrid[i, j].GetWires () [k].SetId (-1);
-                    }
-                }
-            }
-        }
-
-        for (int i = 0; i < masterGrid.GetLength (0); i++) {
-            for (int j = 0; j < masterGrid.GetLength (1); j++) {
-                Wire left = GetLeft (i, j);
-                Wire bottom = GetBottom (i, j);
-
-                int nodeId = -2; // the id at the nod (i, j)
-                if (left == null && bottom == null) {
-                    nodeId = nextId;
-                } else if (left != null && bottom != null) {
-                    nodeId = left.GetId ();
-                    List<Wire> bottomPath = GetAllOfId (bottom.GetId ()); // getting bottom path
-                    foreach (Wire w in bottomPath) { // iterating through bottom path wires
-                        w.SetId (nodeId); // setting bottom path ids to left path ids
-                    }
-                } else if (left == null) { // left null, bottom not null
-                    nodeId = bottom.GetId ();
-                } else { // left not null, bottom null
-                    nodeId = left.GetId ();
-                }
-                Wire top = masterGrid[i, j].GetTop ();
-                Wire right = masterGrid[i, j].GetRight ();
-                if (top != null) {
-                    top.SetId (nodeId);
-                }
-                if (right != null) {
-                    right.SetId (nodeId);
-                }
-                if (top != null || right != null) {
-                    nextId++;
-                }
-            }
-        }
-    }
-
-    private List<Wire> GetAllOfId (int id) {
-        List<Wire> ret = new List<Wire> ();
-        for (int i = 0; i < masterGrid.GetLength (0); i++) {
-            for (int j = 0; j < masterGrid.GetLength (1); j++) {
-                Wire top = masterGrid[i, j].GetTop ();
-                Wire right = masterGrid[i, j].GetRight ();
-                if (top != null && top.GetId () == id) {
-                    ret.Add (top);
-                }
-                if (right != null && right.GetId () == id) {
-                    ret.Add (right);
-                }
-            }
-        }
-        return ret;
-    }
-
-    public void SetAllOfId (int id, bool state) {
-        List<Wire> temp = GetAllOfId (id);
-        foreach (Wire w in temp) {
-            w.SetState (state);
-        }
-    }
-
-    public string GetSelectedComponent() {
-        return selectedComponent;
+    public string GetSelectedPart () {
+        return selectedPart;
     }
 
     private Vector3 ToVector3 (Vector2Int vec) {
@@ -189,16 +112,6 @@ public class WireManager : MonoBehaviour {
         float angle = Mathf.Atan2 ((start.y - end.y), (start.x - end.x)) * Mathf.Rad2Deg;
         if (angle < 0) angle += 180;
         return angle % 180;
-    }
-
-    private void AddToMasterGrid (Wire w) {
-        if (w == null) return;
-        Vector2Int coord = w.GetStartPoint ();
-        if (w.IsVertical ()) {
-            masterGrid[coord.x, coord.y].SetTop (w);
-        } else {
-            masterGrid[coord.x, coord.y].SetRight (w);
-        }
     }
 
     private List<Vector2Int> Interpolate (Vector2Int start, Vector2Int end) {
@@ -237,17 +150,4 @@ public class WireManager : MonoBehaviour {
         return clamped.Equals (vec);
     }
 
-    private Wire GetLeft (int x, int y) {
-        if (x == 0) {
-            return null;
-        }
-        return masterGrid[x - 1, y].GetRight ();
-    }
-
-    private Wire GetBottom (int x, int y) {
-        if (y == 0) {
-            return null;
-        }
-        return masterGrid[x, y - 1].GetTop ();
-    }
 }

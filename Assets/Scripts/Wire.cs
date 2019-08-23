@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wire : Component {
+public class Wire : Part {
 
     private Vector2Int startPoint;
     private Vector2Int endPoint;
@@ -18,7 +18,7 @@ public class Wire : Component {
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
             SetState (!GetState ());
-            FindObjectOfType<WireManager> ().SetAllOfId (GetId (), GetState ());
+            FindObjectOfType<SimulationManager> ().SetAllOfId (GetId (), GetState ());
         }
         sr.color = new Color (0.67f, 0.89f, 0f);
         sr.sortingOrder = 1;

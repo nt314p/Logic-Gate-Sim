@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Component : MonoBehaviour {
+public abstract class Part : MonoBehaviour {
 
     private int id;
     private bool state;

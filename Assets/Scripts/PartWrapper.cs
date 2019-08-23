@@ -1,15 +1,15 @@
-public class ComponenetWrapper {
+public class PartWrapper {
 
     private Wire top, right;
-    private Component node;
+    private Part node;
 
-    public ComponenetWrapper (Wire top, Wire right, Component node) {
+    public PartWrapper (Wire top, Wire right, Part node) {
         this.top = top;
         this.right = right;
         this.node = node;
     }
 
-    public ComponenetWrapper () {
+    public PartWrapper () {
         this.top = null;
         this.right = null;
         this.node = null;
@@ -23,7 +23,7 @@ public class ComponenetWrapper {
         return right;
     }
 
-    public Component GetNode () {
+    public Part GetNode () {
         return node;
     }
 
@@ -39,7 +39,7 @@ public class ComponenetWrapper {
         this.right = right;
     }
 
-    public void SetNode (Component node) {
+    public void SetNode (Part node) {
         this.node = node;
     }
 
