@@ -31,6 +31,10 @@ public class PartWrapper {
         return new Wire[] { top, right };
     }
 
+    public Part[] GetParts () {
+        return new Part[] { top, right, node };
+    }
+
     public void SetTop (Wire top) {
         this.top = top;
     }

@@ -16,10 +16,10 @@ public class SimulationManager : MonoBehaviour {
     void Start () {
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
-        currentCircuit.Initialize (50, 50);
         drawingWirePath = false;
         selectedPart = "";
 
+        currentCircuit = new Circuit (50, 50);
         currentCircuit.Recalculate ();
     }
 
@@ -51,7 +51,6 @@ public class SimulationManager : MonoBehaviour {
                     break;
                 default:
                     break;
-
             }
 
         } else if (Input.GetMouseButton (0)) {
@@ -60,11 +59,12 @@ public class SimulationManager : MonoBehaviour {
 
                 // coordinate is unique and in grid bounds
                 if (!(coord.Equals (prevCoord)) && IsWithinBounds (coord)) {
+                    // is the wire going back on itself
                     if (wirePath.Count >= 2 && wirePath[wirePath.Count - 2] == coord) {
-                        Destroy (wiresInPath[wiresInPath.Count - 1]);
+                        Destroy (wiresInPath[wiresInPath.Count - 1]); // removing wire
                         wirePath.RemoveAt (wirePath.Count - 1);
                         wiresInPath.RemoveAt (wiresInPath.Count - 1);
-                    } else {
+                    } else { // adding new wire
                         List<Vector2Int> interpolated = Interpolate (prevCoord, coord);
                         for (int i = 0; i < interpolated.Count; i++) {
                             wirePath.Add (interpolated[i]);
@@ -85,48 +85,53 @@ public class SimulationManager : MonoBehaviour {
             }
 
             currentCircuit.AddWires (wireList);
-
-            wiresInPath = new List<GameObject> ();
+            wiresInPath = new List<GameObject> (); // resetting variables
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;
         }
     }
 
-    private void CreateLED (Vector2Int coord) {
-        GameObject tempLED = Instantiate (LED, ToVector3 (coord), Quaternion.identity);
+    private void CreateLED (Vector2Int coords) {
+        GameObject tempLED = Instantiate (LED, ToVector3 (coords), Quaternion.identity);
         LED led = tempLED.GetComponent<LED> ();
         led.Initialize ();
-        masterGrid[coord.x, coord.y].SetNode (led);
+        led.SetCoords (coords);
+        currentCircuit.AddLED (led);
     }
 
     public string GetSelectedPart () {
         return selectedPart;
     }
 
-    private Vector3 ToVector3 (Vector2Int vec) {
+    public Circuit GetCircuit () {
+        return currentCircuit;
+    }
+
+    private static Vector3 ToVector3 (Vector2Int vec) {
         return new Vector3 (vec.x, vec.y, 0);
     }
 
     // returns the angle of the vector formed by the vector2s passed in
     private float AngleOf (Vector2Int start, Vector2Int end) {
         float angle = Mathf.Atan2 ((start.y - end.y), (start.x - end.x)) * Mathf.Rad2Deg;
-        if (angle < 0) angle += 180;
+        if (angle < 0) angle += 180; // we want a positive angle
         return angle % 180;
     }
 
+    // Interpolate method determines the horizontal and vertical steps to model a diagonal line
     private List<Vector2Int> Interpolate (Vector2Int start, Vector2Int end) {
-        List<Vector2Int> ret = new List<Vector2Int> ();
+        List<Vector2Int> ret = new List<Vector2Int> (); // list of the coordinates of the steps
         ret.Add (start);
 
-        float targetAngle = AngleOf (start, end);
+        float targetAngle = AngleOf (start, end); // determining angle of the diagonal line to approximate
 
-        int steps = Mathf.Abs (start.x - end.x) + Mathf.Abs (start.y - end.y);
-        int signX = Mathf.RoundToInt (Mathf.Sign ((end.x - start.x)));
-        int signY = Mathf.RoundToInt (Mathf.Sign ((end.y - start.y)));
+        int steps = Mathf.Abs (start.x - end.x) + Mathf.Abs (start.y - end.y); // compute total steps
+        int signX = Mathf.RoundToInt (Mathf.Sign ((end.x - start.x))); // which direction steps
+        int signY = Mathf.RoundToInt (Mathf.Sign ((end.y - start.y))); // go in (up down left right)
 
         for (int i = 0; i < steps; i++) { // stepping and incrementing
             Vector2Int last = ret[ret.Count - 1];
-            Vector2Int vStep = new Vector2Int (last.x, last.y + signY);
+            Vector2Int vStep = new Vector2Int (last.x, last.y + signY); // computing both possible steps
             Vector2Int hStep = new Vector2Int (last.x + signX, last.y);
 
             // the angle formed when the last coordinate is incremented by a vertical step
@@ -137,7 +142,7 @@ public class SimulationManager : MonoBehaviour {
             if (Mathf.Abs (vAngle - targetAngle) < Mathf.Abs (hAngle - targetAngle)) {
                 ret.Add (vStep); // vertical step brings us closer to the target angle
             } else {
-                ret.Add (hStep);
+                ret.Add (hStep); // horizontal step brings us closer to the target angle
             }
         }
         ret.RemoveAt (0); // removing starting coordinate

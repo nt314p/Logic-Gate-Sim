@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Wire : Part {
 
-    private Vector2Int startPoint;
     private Vector2Int endPoint;
     private bool vertical;
     private SpriteRenderer sr;
@@ -18,7 +17,9 @@ public class Wire : Part {
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
             SetState (!GetState ());
-            FindObjectOfType<SimulationManager> ().SetAllOfId (GetId (), GetState ());
+            FindObjectOfType<SimulationManager> ().GetCircuit ().SetAllOfId (GetId (), GetState ());
+        } else {
+            Debug.Log ("clicked " + this.ToString ());
         }
         sr.color = new Color (0.67f, 0.89f, 0f);
         sr.sortingOrder = 1;
@@ -39,16 +40,16 @@ public class Wire : Part {
             end = tmp;
         }
 
-        startPoint = start;
+        SetCoords (start);
         endPoint = end;
 
         if (start.x == end.x) {
             vertical = true;
             this.transform.localScale = new Vector3 (1.38f, 13.8f, 1);
-            this.transform.position = new Vector3 (startPoint.x, startPoint.y + 0.5f, -0.01f);
+            this.transform.position = new Vector3 (GetCoords ().x, GetCoords ().y + 0.5f, -0.01f);
         } else {
             this.transform.localScale = new Vector3 (13.8f, 1.38f, 1);
-            this.transform.position = new Vector3 (startPoint.x + 0.5f, startPoint.y, -0.01f);
+            this.transform.position = new Vector3 (GetCoords ().x + 0.5f, GetCoords ().y, -0.01f);
         }
     }
 
@@ -68,16 +69,12 @@ public class Wire : Part {
         }
     }
 
-    public Vector2Int GetStartPoint () {
-        return startPoint;
-    }
-
     public bool IsVertical () {
         return vertical;
     }
 
     public bool Equals (Wire w) {
-        return startPoint.Equals (w.startPoint) && endPoint.Equals (w.endPoint);
+        return GetCoords ().Equals (w.GetCoords ()) && endPoint.Equals (w.endPoint);
     }
 
 }

@@ -6,24 +6,37 @@ public abstract class Part : MonoBehaviour {
 
     private int id;
     private bool state;
-
-    public void SetId (int id) {
-        this.id = id;
-    }
+    private Vector2Int coords;
 
     public int GetId () {
         return id;
+    }
+
+    public void SetId (int id) {
+        this.id = id;
     }
 
     public bool GetState () {
         return state;
     }
 
-    public void SetState(bool state) {
+    public void SetState (bool state) {
         this.state = state;
-        OnStateUpdate();
+        OnStateUpdate ();
     }
 
-    public abstract void OnStateUpdate();
+    public Vector2Int GetCoords () {
+        return coords;
+    }
+
+    public void SetCoords (Vector2Int coords) {
+        this.coords = coords;
+    }
+
+    public abstract void OnStateUpdate ();
+
+    public override string ToString() {
+        return "Part Id: " + id;
+    }
 
 }
