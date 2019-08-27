@@ -45,7 +45,7 @@ public class Circuit {
                 Wire left = GetLeft (i, j);
                 Wire bottom = GetBottom (i, j);
 
-                int nodeId = -2; // the id at the nod (i, j)
+                int nodeId = -2; // the id at the node (i, j)
                 if (left == null && bottom == null) {
                     nodeId = nextId;
                 } else if (left != null && bottom != null) {
@@ -53,7 +53,9 @@ public class Circuit {
                     List<Part> bottomPathParts = GetAllOfId (bottom.GetId ()); // getting bottom path
                     foreach (Part p in bottomPathParts) { // iterating through bottom path wires
                         if (p is Wire) {
-                            p.SetId (nodeId); // setting bottom path ids to left path ids
+                            // int prevId = p.GetId();
+                            // p.SetId (nodeId); 
+                            UpdatePartIdInDict(p, nodeId); // setting bottom path ids to left path ids
                         }
 
                     }
@@ -67,8 +69,7 @@ public class Circuit {
 
                 foreach (Part p in nodeParts) {
                     if (p != null) {
-                        p.SetId (nodeId);
-                        AddPartToDict (p);
+                        UpdatePartIdInDict(p, nodeId);
                     }
                 }
 
@@ -77,6 +78,17 @@ public class Circuit {
 
                 if (top != null || right != null) {
                     nextId++;
+                }
+            }
+        }
+
+        // adding parts to dictionary
+        for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
+            for (int j = 0; j < partsGrid.GetLength (1); j++) {
+                for (int k = 0; k < 2; k++) {
+                    if (partsGrid[i, j].GetWires () [k] != null) {
+                        AddPartToDict(partsGrid[i, j].GetWires () [k]);
+                    }
                 }
             }
         }
@@ -153,6 +165,14 @@ public class Circuit {
         }
         partsOfId.Add (part);
         Debug.Log ("Added part: " + part.ToString ());
+    }
+
+    // finds the part, removes 
+    private void UpdatePartIdInDict (Part part, int newId) {
+        List<Part> partsOfId = parts[part.GetId()];
+        partsOfId.Remove(part);
+        part.SetId(newId);
+        AddPartToDict(part);
     }
 
     private Wire GetLeft (int x, int y) {
