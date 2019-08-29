@@ -11,6 +11,8 @@ public class SimulationManager : MonoBehaviour {
     private bool drawingWirePath;
     private string selectedPart;
     private Circuit currentCircuit;
+    public int width;
+    public int height;
 
     // Start is called before the first frame update
     void Start () {
@@ -19,7 +21,7 @@ public class SimulationManager : MonoBehaviour {
         drawingWirePath = false;
         selectedPart = "";
 
-        currentCircuit = new Circuit (50, 50);
+        currentCircuit = new Circuit (GridController.width, GridController.height);
         currentCircuit.Recalculate ();
     }
 

@@ -29,6 +29,8 @@ public class LED : Part {
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
             SetState (!GetState ());
+        } else {
+            Debug.Log ("clicked " + this.ToString ());
         }
         sr.color = new Color (0.67f, 0.89f, 0f);
     }

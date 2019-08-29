@@ -33,8 +33,8 @@ public class Circuit {
         for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
             for (int j = 0; j < partsGrid.GetLength (1); j++) {
                 for (int k = 0; k < 2; k++) {
-                    if (partsGrid[i, j].GetWires () [k] != null) {
-                        partsGrid[i, j].GetWires () [k].SetId (-1);
+                    if (partsGrid[i, j].GetParts () [k] != null) {
+                        partsGrid[i, j].GetParts () [k].SetId (-1);
                     }
                 }
             }
@@ -51,12 +51,17 @@ public class Circuit {
                 } else if (left != null && bottom != null) {
                     nodeId = left.GetId ();
                     List<Part> bottomPathParts = GetAllOfId (bottom.GetId ()); // getting bottom path
-                    foreach (Part p in bottomPathParts) { // iterating through bottom path wires
-                        if (p is Wire) {
-                            // int prevId = p.GetId();
-                            // p.SetId (nodeId); 
-                            UpdatePartIdInDict(p, nodeId); // setting bottom path ids to left path ids
+                    for (int k = 0; k < bottomPathParts.Count; k++) { // iterating through bottom path parts
+                        Part p = bottomPathParts[k];
+                        //if (p is Wire) {
+                        // int prevId = p.GetId();
+                        // p.SetId (nodeId); 
+                        // setting bottom path ids to left path ids
+                        if (UpdatePartIdInDict (p, nodeId)) {
+                            // return is true, a part was moved and not created
+                            k--;
                         }
+                        //}
 
                     }
                 } else if (left == null) { // left null, bottom not null
@@ -69,7 +74,7 @@ public class Circuit {
 
                 foreach (Part p in nodeParts) {
                     if (p != null) {
-                        UpdatePartIdInDict(p, nodeId);
+                        UpdatePartIdInDict (p, nodeId);
                     }
                 }
 
@@ -87,7 +92,7 @@ public class Circuit {
             for (int j = 0; j < partsGrid.GetLength (1); j++) {
                 for (int k = 0; k < 2; k++) {
                     if (partsGrid[i, j].GetWires () [k] != null) {
-                        AddPartToDict(partsGrid[i, j].GetWires () [k]);
+                        AddPartToDict (partsGrid[i, j].GetWires () [k]);
                     }
                 }
             }
@@ -132,7 +137,10 @@ public class Circuit {
     }
 
     public void AddLED (Part led) {
+        led.SetId (nextId);
         AddPart (led);
+        nextId++;
+        Recalculate ();
     }
 
     private void AddPart (Part p) {
@@ -149,7 +157,7 @@ public class Circuit {
             LED led = (LED) p;
             partsGrid[coords.x, coords.y].SetNode (led);
         }
-        AddPartToDict(p);
+        AddPartToDict (p);
     }
 
     private void AddPartToDict (Part part) {
@@ -168,11 +176,16 @@ public class Circuit {
     }
 
     // finds the part, removes 
-    private void UpdatePartIdInDict (Part part, int newId) {
-        List<Part> partsOfId = parts[part.GetId()];
-        partsOfId.Remove(part);
-        part.SetId(newId);
-        AddPartToDict(part);
+    private bool UpdatePartIdInDict (Part part, int newId) {
+        bool idExists = parts.ContainsKey (part.GetId ());
+        bool hasSameId = part.GetId () == newId;
+        if (idExists) {
+            List<Part> partsOfId = parts[part.GetId ()];
+            partsOfId.Remove (part);
+        }
+        part.SetId (newId);
+        AddPartToDict (part);
+        return idExists && !hasSameId; // prevent infinite loops
     }
 
     private Wire GetLeft (int x, int y) {
