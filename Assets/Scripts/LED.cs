@@ -8,7 +8,6 @@ public class LED : Part {
 
     // Start is called before the first frame update
     void Start () {
-        SetId (-1);
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
         SetState (false);
         UpdateColor ();

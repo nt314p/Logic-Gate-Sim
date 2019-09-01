@@ -28,6 +28,7 @@ public class Circuit {
     }
 
     public void Recalculate () {
+        Debug.Log("RECALCULATING!");
         parts = new Dictionary<int, List<Part>> ();
         nextId = 0;
         for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
@@ -91,8 +92,8 @@ public class Circuit {
         for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
             for (int j = 0; j < partsGrid.GetLength (1); j++) {
                 for (int k = 0; k < 2; k++) {
-                    if (partsGrid[i, j].GetWires () [k] != null) {
-                        AddPartToDict (partsGrid[i, j].GetWires () [k]);
+                    if (partsGrid[i, j].GetParts () [k] != null) {
+                        AddPartToDict (partsGrid[i, j].GetParts () [k]);
                     }
                 }
             }
