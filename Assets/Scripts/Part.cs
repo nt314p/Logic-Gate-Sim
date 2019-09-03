@@ -36,7 +36,7 @@ public abstract class Part : MonoBehaviour {
     public abstract void OnStateUpdate ();
 
     public override string ToString() {
-        return "Part Id: " + id;
+        return "Type: " + this.GetType() +"| Part Id: " + id;
     }
 
 }

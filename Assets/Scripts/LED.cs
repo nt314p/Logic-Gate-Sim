@@ -39,6 +39,6 @@ public class LED : Part {
     }
 
     public override void OnStateUpdate () {
-
+        UpdateColor ();
     }
 }

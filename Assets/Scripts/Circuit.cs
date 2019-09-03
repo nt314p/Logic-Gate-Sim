@@ -89,15 +89,15 @@ public class Circuit {
         }
 
         // adding parts to dictionary
-        for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
-            for (int j = 0; j < partsGrid.GetLength (1); j++) {
-                for (int k = 0; k < 2; k++) {
-                    if (partsGrid[i, j].GetParts () [k] != null) {
-                        AddPartToDict (partsGrid[i, j].GetParts () [k]);
-                    }
-                }
-            }
-        }
+        // for (int i = 0; i < partsGrid.GetLength (0); i++) {
+        //     for (int j = 0; j < partsGrid.GetLength (1); j++) {
+        //         for (int k = 0; k < 2; k++) {
+        //             if (partsGrid[i, j].GetParts () [k] != null) {
+        //                 AddPartToDict (partsGrid[i, j].GetParts () [k]);
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     public List<Part> GetAllOfId (int id) {
@@ -157,6 +157,7 @@ public class Circuit {
         } else if (p is LED) {
             LED led = (LED) p;
             partsGrid[coords.x, coords.y].SetNode (led);
+            Debug.Log("ADDED AN LED!");
         }
         AddPartToDict (p);
     }

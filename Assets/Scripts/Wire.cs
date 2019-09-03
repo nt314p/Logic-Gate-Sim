@@ -17,7 +17,9 @@ public class Wire : Part {
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
             SetState (!GetState ());
-            FindObjectOfType<SimulationManager> ().GetCircuit ().SetAllOfId (GetId (), GetState ());
+            SimulationManager sim = FindObjectOfType<SimulationManager> ();
+            Circuit currCircuit = sim.GetCircuit ();
+            currCircuit.SetAllOfId (GetId (), GetState ());
         } else {
             Debug.Log ("clicked " + this.ToString ());
         }
