@@ -6,6 +6,7 @@ public class SimulationManager : MonoBehaviour {
 
     public GameObject wire;
     public GameObject LED;
+    public GameObject Switch;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
     private bool drawingWirePath;
@@ -31,6 +32,8 @@ public class SimulationManager : MonoBehaviour {
             selectedPart = "wire";
         } else if (Input.GetKey (KeyCode.L)) {
             selectedPart = "led";
+        } else if (Input.GetKey (KeyCode.S)) {
+            selectedPart = "switch";
         } else {
             selectedPart = "";
         }
@@ -50,6 +53,9 @@ public class SimulationManager : MonoBehaviour {
                     break;
                 case "led":
                     CreateLED (coord);
+                    break;
+                case "switch":
+                    CreateSwitch (coord);
                     break;
                 default:
                     break;
@@ -93,12 +99,19 @@ public class SimulationManager : MonoBehaviour {
         }
     }
 
+    // REPLACE BOTH FUNCTIONS BELOW WITH A CREATE NODE FUNCTION
     private void CreateLED (Vector2Int coords) {
         GameObject tempLED = Instantiate (LED, ToVector3 (coords), Quaternion.identity);
         LED led = tempLED.GetComponent<LED> ();
-        led.Initialize ();
         led.SetCoords (coords);
         currentCircuit.AddLED (led);
+    }
+
+    private void CreateSwitch (Vector2Int coords) {
+        GameObject tempSW = Instantiate (Switch, ToVector3 (coords), Quaternion.identity);
+        Switch sw = tempSW.GetComponent<Switch> ();
+        sw.SetCoords (coords);
+        currentCircuit.AddSwitch (sw);
     }
 
     public string GetSelectedPart () {

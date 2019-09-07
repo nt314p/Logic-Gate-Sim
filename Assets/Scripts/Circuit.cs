@@ -28,7 +28,7 @@ public class Circuit {
     }
 
     public void Recalculate () {
-        Debug.Log("RECALCULATING!");
+        Debug.Log("Recalculating!");
         parts = new Dictionary<int, List<Part>> ();
         nextId = 0;
         for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
@@ -88,16 +88,7 @@ public class Circuit {
             }
         }
 
-        // adding parts to dictionary
-        // for (int i = 0; i < partsGrid.GetLength (0); i++) {
-        //     for (int j = 0; j < partsGrid.GetLength (1); j++) {
-        //         for (int k = 0; k < 2; k++) {
-        //             if (partsGrid[i, j].GetParts () [k] != null) {
-        //                 AddPartToDict (partsGrid[i, j].GetParts () [k]);
-        //             }
-        //         }
-        //     }
-        // }
+        Debug.Log("Recalculation Complete!");
     }
 
     public List<Part> GetAllOfId (int id) {
@@ -144,6 +135,13 @@ public class Circuit {
         Recalculate ();
     }
 
+    public void AddSwitch (Part sw) {
+        sw.SetId (nextId);
+        AddPart (sw);
+        nextId++;
+        Recalculate ();
+    }
+
     private void AddPart (Part p) {
         Vector2Int coords = p.GetCoords ();
         if (p is Wire) {
@@ -158,6 +156,10 @@ public class Circuit {
             LED led = (LED) p;
             partsGrid[coords.x, coords.y].SetNode (led);
             Debug.Log("ADDED AN LED!");
+        } else if (p is Switch) {
+            Switch sw = (Switch) p;
+            partsGrid[coords.x, coords.y].SetNode (sw);
+            Debug.Log("ADDED A SWITCH!");
         }
         AddPartToDict (p);
     }
@@ -174,7 +176,6 @@ public class Circuit {
             parts.Add (partId, partsOfId);
         }
         partsOfId.Add (part);
-        Debug.Log ("Added part: " + part.ToString ());
     }
 
     // finds the part, removes 
