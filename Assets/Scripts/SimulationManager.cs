@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class SimulationManager : MonoBehaviour {
 
-    public GameObject wire;
-    public GameObject LED;
-    public GameObject Switch;
+    public static GameObject wire;
+    public static GameObject LED;
+    public static GameObject Switch;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
     private bool drawingWirePath;
@@ -17,6 +17,10 @@ public class SimulationManager : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start () {
+        wire = (GameObject) Resources.Load ("Prefabs/Wire", typeof (GameObject));
+        LED = (GameObject) Resources.Load ("Prefabs/LED", typeof (GameObject));
+        Switch = (GameObject) Resources.Load ("Prefabs/Switch", typeof (GameObject));
+
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
         drawingWirePath = false;
@@ -52,10 +56,10 @@ public class SimulationManager : MonoBehaviour {
                     }
                     break;
                 case "led":
-                    CreateLED (coord);
+                    currentCircuit.AddNode (LED, coord);
                     break;
                 case "switch":
-                    CreateSwitch (coord);
+                    currentCircuit.AddNode (Switch, coord);
                     break;
                 default:
                     break;
@@ -97,21 +101,6 @@ public class SimulationManager : MonoBehaviour {
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;
         }
-    }
-
-    // REPLACE BOTH FUNCTIONS BELOW WITH A CREATE NODE FUNCTION
-    private void CreateLED (Vector2Int coords) {
-        GameObject tempLED = Instantiate (LED, ToVector3 (coords), Quaternion.identity);
-        LED led = tempLED.GetComponent<LED> ();
-        led.SetCoords (coords);
-        currentCircuit.AddLED (led);
-    }
-
-    private void CreateSwitch (Vector2Int coords) {
-        GameObject tempSW = Instantiate (Switch, ToVector3 (coords), Quaternion.identity);
-        Switch sw = tempSW.GetComponent<Switch> ();
-        sw.SetCoords (coords);
-        currentCircuit.AddSwitch (sw);
     }
 
     public string GetSelectedPart () {

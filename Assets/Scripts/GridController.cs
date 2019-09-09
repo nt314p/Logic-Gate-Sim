@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class GridController : MonoBehaviour {
-    public static int width = 50;
-    public static int height = 50;
+    public static int width = 30;
+    public static int height = 30;
     private Material gridMat;
     private GameObject gridPlane;
 

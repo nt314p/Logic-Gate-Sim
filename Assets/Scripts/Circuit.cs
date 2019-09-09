@@ -28,7 +28,7 @@ public class Circuit {
     }
 
     public void Recalculate () {
-        Debug.Log("Recalculating!");
+        Debug.Log ("Recalculating!");
         parts = new Dictionary<int, List<Part>> ();
         nextId = 0;
         for (int i = 0; i < partsGrid.GetLength (0); i++) { // clearing ids
@@ -54,16 +54,12 @@ public class Circuit {
                     List<Part> bottomPathParts = GetAllOfId (bottom.GetId ()); // getting bottom path
                     for (int k = 0; k < bottomPathParts.Count; k++) { // iterating through bottom path parts
                         Part p = bottomPathParts[k];
-                        //if (p is Wire) {
-                        // int prevId = p.GetId();
-                        // p.SetId (nodeId); 
+                        
                         // setting bottom path ids to left path ids
                         if (UpdatePartIdInDict (p, nodeId)) {
                             // return is true, a part was moved and not created
                             k--;
                         }
-                        //}
-
                     }
                 } else if (left == null) { // left null, bottom not null
                     nodeId = bottom.GetId ();
@@ -87,26 +83,11 @@ public class Circuit {
                 }
             }
         }
-
-        Debug.Log("Recalculation Complete!");
+        Debug.Log ("Recalculation Complete!");
     }
 
     public List<Part> GetAllOfId (int id) {
         return parts[id];
-        // List<Part> ret = new List<Part> ();
-        // for (int i = 0; i < partsGrid.GetLength (0); i++) {
-        //     for (int j = 0; j < partsGrid.GetLength (1); j++) {
-        //         Wire top = partsGrid[i, j].GetTop ();
-        //         Wire right = partsGrid[i, j].GetRight ();
-        //         if (top != null && top.GetId () == id) {
-        //             ret.Add (top);
-        //         }
-        //         if (right != null && right.GetId () == id) {
-        //             ret.Add (right);
-        //         }
-        //     }
-        // }
-        // return ret;
     }
 
     public void SetAllOfId (int id, bool state) {
@@ -114,6 +95,16 @@ public class Circuit {
         foreach (Part p in temp) {
             p.SetState (state);
         }
+    }
+
+    public void AddNode(GameObject nodeObj, Vector2Int coords) {
+        GameObject tempObj = MonoBehaviour.Instantiate (nodeObj, ToVector3 (coords), Quaternion.identity);
+        Part nodePart = tempObj.GetComponent<Part>();
+        nodePart.SetCoords (coords);
+        nodePart.SetId (nextId);
+        AddPart(nodePart);
+        nextId++;
+        Recalculate();
     }
 
     public void AddWires (List<Wire> wires) {
@@ -126,20 +117,6 @@ public class Circuit {
             nextId++;
             Recalculate ();
         }
-    }
-
-    public void AddLED (Part led) {
-        led.SetId (nextId);
-        AddPart (led);
-        nextId++;
-        Recalculate ();
-    }
-
-    public void AddSwitch (Part sw) {
-        sw.SetId (nextId);
-        AddPart (sw);
-        nextId++;
-        Recalculate ();
     }
 
     private void AddPart (Part p) {
@@ -155,11 +132,11 @@ public class Circuit {
         } else if (p is LED) {
             LED led = (LED) p;
             partsGrid[coords.x, coords.y].SetNode (led);
-            Debug.Log("ADDED AN LED!");
+            Debug.Log ("ADDED AN LED!");
         } else if (p is Switch) {
             Switch sw = (Switch) p;
             partsGrid[coords.x, coords.y].SetNode (sw);
-            Debug.Log("ADDED A SWITCH!");
+            Debug.Log ("ADDED A SWITCH!");
         }
         AddPartToDict (p);
     }
@@ -178,7 +155,6 @@ public class Circuit {
         partsOfId.Add (part);
     }
 
-    // finds the part, removes 
     private bool UpdatePartIdInDict (Part part, int newId) {
         bool idExists = parts.ContainsKey (part.GetId ());
         bool hasSameId = part.GetId () == newId;
@@ -189,6 +165,10 @@ public class Circuit {
         part.SetId (newId);
         AddPartToDict (part);
         return idExists && !hasSameId; // prevent infinite loops
+    }
+
+    private static Vector3 ToVector3 (Vector2Int vec) {
+        return new Vector3 (vec.x, vec.y, 0);
     }
 
     private Wire GetLeft (int x, int y) {
