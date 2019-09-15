@@ -11,6 +11,7 @@ public class Wire : Part {
     void Start () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
         SetState (false);
+        SetIsActive(false);
         UpdateColor ();
     }
 

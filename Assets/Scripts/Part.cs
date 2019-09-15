@@ -7,6 +7,7 @@ public abstract class Part : MonoBehaviour {
     private int id;
     private bool state;
     private Vector2Int coords;
+    private bool isActive; // state cannot be changed externally
 
     public int GetId () {
         return id;
@@ -33,6 +34,14 @@ public abstract class Part : MonoBehaviour {
         this.coords = coords;
     }
 
+    public bool IsActive () {
+        return isActive;
+    }
+
+    public void SetIsActive(bool isActive) {
+        this.isActive = isActive;
+    }
+    
     public abstract void OnStateUpdate ();
 
     public override string ToString() {

@@ -20,6 +20,7 @@ public class Switch : Part {
             }
         }
         SetState (false);
+        SetIsActive(true);
     }
 
     // Update is called once per frame

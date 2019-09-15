@@ -27,7 +27,7 @@ public class Circuit {
         nextId++;
     }
 
-    public void Recalculate () {
+    public void RecalculateIds () {
         Debug.Log ("Recalculating!");
         parts = new Dictionary<int, List<Part>> ();
         nextId = 0;
@@ -54,7 +54,7 @@ public class Circuit {
                     List<Part> bottomPathParts = GetAllOfId (bottom.GetId ()); // getting bottom path
                     for (int k = 0; k < bottomPathParts.Count; k++) { // iterating through bottom path parts
                         Part p = bottomPathParts[k];
-                        
+
                         // setting bottom path ids to left path ids
                         if (UpdatePartIdInDict (p, nodeId)) {
                             // return is true, a part was moved and not created
@@ -84,27 +84,68 @@ public class Circuit {
             }
         }
         Debug.Log ("Recalculation Complete!");
+        TrimIds ();
+    }
+
+    public void TrimIds () {
+        nextId = 0;
+
+        List<int> ids = (List<int>) parts.Keys;
+        Debug.Log("trimmin'");
+        foreach (int currId in ids) {
+            if (parts[currId].Count == 0) {
+                parts.Remove (currId);
+            } else {
+                ReplaceId (currId, nextId++);
+            }
+        }
+    }
+
+    public void CalculateStates () {
+
+    }
+
+    public void ReplaceId (int oldId, int newId) {
+        parts[newId] = parts[oldId];
+        if (oldId != newId) {
+            parts.Remove (oldId);
+        }
     }
 
     public List<Part> GetAllOfId (int id) {
         return parts[id];
     }
 
+    // soft set all, ignores active components
     public void SetAllOfId (int id, bool state) {
         List<Part> temp = GetAllOfId (id);
         foreach (Part p in temp) {
-            p.SetState (state);
+            if (!p.IsActive ()) {
+                p.SetState (state);
+            }
         }
     }
 
-    public void AddNode(GameObject nodeObj, Vector2Int coords) {
+    // hard set all, sets ALL components
+    public void SetAllOfId (int id, bool state, bool hardSet) {
+        if (hardSet) { // hard set
+            List<Part> temp = GetAllOfId (id);
+            foreach (Part p in temp) {
+                p.SetState (state);
+            }
+        } else { // soft set
+            SetAllOfId (id, state);
+        }
+    }
+
+    public void AddNode (GameObject nodeObj, Vector2Int coords) {
         GameObject tempObj = MonoBehaviour.Instantiate (nodeObj, ToVector3 (coords), Quaternion.identity);
-        Part nodePart = tempObj.GetComponent<Part>();
+        Part nodePart = tempObj.GetComponent<Part> ();
         nodePart.SetCoords (coords);
         nodePart.SetId (nextId);
-        AddPart(nodePart);
+        AddPart (nodePart);
         nextId++;
-        Recalculate();
+        RecalculateIds ();
     }
 
     public void AddWires (List<Wire> wires) {
@@ -115,7 +156,7 @@ public class Circuit {
 
         if (wires.Count > 0) {
             nextId++;
-            Recalculate ();
+            RecalculateIds ();
         }
     }
 
@@ -152,7 +193,11 @@ public class Circuit {
         } else { // key (id) doesn't exist, initialize list
             parts.Add (partId, partsOfId);
         }
-        partsOfId.Add (part);
+        if (part.IsActive ()) {
+            partsOfId.Insert (0, part); // inserting active part at the front
+        } else {
+            partsOfId.Add (part); // adding passive part to the end
+        }
     }
 
     private bool UpdatePartIdInDict (Part part, int newId) {

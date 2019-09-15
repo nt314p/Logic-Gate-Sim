@@ -27,7 +27,7 @@ public class SimulationManager : MonoBehaviour {
         selectedPart = "";
 
         currentCircuit = new Circuit (GridController.width, GridController.height);
-        currentCircuit.Recalculate ();
+        currentCircuit.RecalculateIds ();
     }
 
     // Update is called once per frame
