@@ -9,7 +9,7 @@ public class SimulationManager : MonoBehaviour {
     public static GameObject Switch;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
-    private bool drawingWirePath;
+    public bool drawingWirePath;
     private string selectedPart;
     private Circuit currentCircuit;
     public int width;

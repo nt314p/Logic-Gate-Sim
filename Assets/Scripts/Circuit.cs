@@ -89,8 +89,8 @@ public class Circuit {
 
     public void TrimIds () {
         nextId = 0;
-
-        List<int> ids = (List<int>) parts.Keys;
+        int[] ids = new int[parts.Keys.Count];
+        parts.Keys.CopyTo(ids, 0);
         Debug.Log("trimmin'");
         foreach (int currId in ids) {
             if (parts[currId].Count == 0) {
@@ -101,14 +101,18 @@ public class Circuit {
         }
     }
 
-    public void CalculateStates () {
-
+    public void CalculateStateId () {
+        // separate active and passive components
+        // NAND active components
     }
 
     public void ReplaceId (int oldId, int newId) {
         parts[newId] = parts[oldId];
         if (oldId != newId) {
             parts.Remove (oldId);
+        }
+        foreach (Part p in parts[newId]) {
+            p.SetId(newId);
         }
     }
 
