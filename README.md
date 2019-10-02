@@ -1,6 +1,12 @@
 # Logic-Gate-Sim
 Build, simulate, and abstract your logic gate circuits by including designs within other designs!
 
+1. Create a circuit
+2. Save it
+3. Create another circuit
+4. Use the first circuit that you created in your current circuit!
+5. It's that easy! (warning: steps reference nonexistent but planned functionality)
+
 This is a simple program where you can drag and drop components onto a grid.
 
 These components can be then simulated.
