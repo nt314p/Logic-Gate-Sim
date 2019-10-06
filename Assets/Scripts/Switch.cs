@@ -8,8 +8,7 @@ public class Switch : Part {
     private float currY;
     private float tarY;
 
-    // Start is called before the first frame update
-    void Start () {
+    void Awake () {
         tarY = -0.015f;
         currY = tarY;
         Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
@@ -39,7 +38,7 @@ public class Switch : Part {
             SetState (!GetState ());
             SimulationManager sim = FindObjectOfType<SimulationManager> ();
             Circuit currCircuit = sim.GetCircuit ();
-            currCircuit.SetAllOfId (GetId (), GetState ());
+            currCircuit.CalculateStateId(GetId());
         } else {
             Debug.Log ("clicked " + this.ToString ());
         }

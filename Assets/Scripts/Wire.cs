@@ -8,22 +8,15 @@ public class Wire : Part {
     private bool vertical;
     private SpriteRenderer sr;
 
-    void Start () {
+    void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
         SetState (false);
-        SetIsActive(false);
+        SetIsActive (false);
         UpdateColor ();
     }
 
     void OnMouseDown () {
-        if (Input.GetKey (KeyCode.LeftControl)) {
-            SetState (!GetState ());
-            SimulationManager sim = FindObjectOfType<SimulationManager> ();
-            Circuit currCircuit = sim.GetCircuit ();
-            currCircuit.SetAllOfId (GetId (), GetState ());
-        } else {
-            Debug.Log ("clicked " + this.ToString ());
-        }
+        Debug.Log ("clicked " + this.ToString ());
         sr.color = new Color (0.67f, 0.89f, 0f);
         sr.sortingOrder = 1;
     }

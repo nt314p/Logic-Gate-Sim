@@ -41,8 +41,8 @@ public class Circuit {
             }
         }
 
-        for (int i = 0; i < partsGrid.GetLength (0); i++) {
-            for (int j = 0; j < partsGrid.GetLength (1); j++) {
+        for (int i = 0; i < partsGrid.GetLength (0); i++) { 
+            for (int j = 0; j < partsGrid.GetLength (1); j++) { // iterating through 2d grid
                 Wire left = GetLeft (i, j);
                 Wire bottom = GetBottom (i, j);
 
@@ -83,15 +83,21 @@ public class Circuit {
                 }
             }
         }
-        Debug.Log ("Recalculation Complete!");
+
         TrimIds ();
+        
+        int[] ids = new int[parts.Keys.Count];
+        parts.Keys.CopyTo (ids, 0);
+        foreach (int currId in ids) { // recalculating states for all ids
+            CalculateStateId(currId);
+        }
     }
 
     public void TrimIds () {
         nextId = 0;
         int[] ids = new int[parts.Keys.Count];
-        parts.Keys.CopyTo(ids, 0);
-        Debug.Log("trimmin'");
+        parts.Keys.CopyTo (ids, 0);
+        Debug.Log ("trimmin'");
         foreach (int currId in ids) {
             if (parts[currId].Count == 0) {
                 parts.Remove (currId);
@@ -101,9 +107,14 @@ public class Circuit {
         }
     }
 
-    public void CalculateStateId () {
-        // separate active and passive components
-        // NAND active components
+    public void CalculateStateId (int id) {
+        bool state = false;
+        foreach (Part p in parts[id]) {
+            if (!p.IsActive()) // end of active parts
+                break;
+            state |= p.GetState();
+        }
+        SetAllOfId(id, state);
     }
 
     public void ReplaceId (int oldId, int newId) {
@@ -112,7 +123,7 @@ public class Circuit {
             parts.Remove (oldId);
         }
         foreach (Part p in parts[newId]) {
-            p.SetId(newId);
+            p.SetId (newId);
         }
     }
 

@@ -95,11 +95,12 @@ public class SimulationManager : MonoBehaviour {
             for (int i = 0; i < wiresInPath.Count; i++) {
                 wireList.Add (wiresInPath[i].GetComponent<Wire> ());
             }
-
-            currentCircuit.AddWires (wireList);
+            if (wireList.Count > 0)
+                currentCircuit.AddWires (wireList);
             wiresInPath = new List<GameObject> (); // resetting variables
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;
+            
         }
     }
 

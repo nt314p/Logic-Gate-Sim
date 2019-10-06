@@ -6,8 +6,7 @@ public class LED : Part {
 
     private SpriteRenderer sr;
 
-    // Start is called before the first frame update
-    void Start () {
+    void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
         SetState (false);
         SetIsActive(false);
