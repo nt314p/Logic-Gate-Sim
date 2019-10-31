@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SimulationManager : MonoBehaviour {
 
-    public static GameObject wire;
+        public static GameObject wire;
     public static GameObject LED;
     public static GameObject Switch;
     private List<GameObject> wiresInPath;

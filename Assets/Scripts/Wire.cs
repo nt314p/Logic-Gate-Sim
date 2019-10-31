@@ -16,7 +16,6 @@ public class Wire : Part {
     }
 
     void OnMouseDown () {
-        Debug.Log ("clicked " + this.ToString ());
         sr.color = new Color (0.67f, 0.89f, 0f);
         sr.sortingOrder = 1;
     }
