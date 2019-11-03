@@ -36,9 +36,7 @@ public class Switch : Part {
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
             SetState (!GetState ());
-            SimulationManager sim = FindObjectOfType<SimulationManager> ();
-            Circuit currCircuit = sim.GetCircuit ();
-            currCircuit.CalculateStateId(GetId());
+            GetSim().GetCircuit().CalculateStateId(GetId());
         } else {
             Debug.Log ("clicked " + this.ToString ());
         }
@@ -56,5 +54,9 @@ public class Switch : Part {
 
     public void UpdateState () {
 
+    }
+
+    public override void OnSelectUpdate() {
+        throw new System.NotImplementedException();
     }
 }

@@ -16,8 +16,8 @@ public class Wire : Part {
     }
 
     void OnMouseDown () {
-        sr.color = new Color (0.67f, 0.89f, 0f);
-        sr.sortingOrder = 1;
+        SetSelected (!IsSelected ());
+        UpdateColor ();
     }
 
     void OnMouseUp () {
@@ -56,8 +56,15 @@ public class Wire : Part {
         UpdateColor ();
     }
 
+    public override void OnSelectUpdate () {
+        UpdateColor ();
+    }
+
     public void UpdateColor () {
-        if (GetState ()) {
+        if (IsSelected ()) {
+            sr.color = new Color (0.67f, 0.89f, 0f);
+            sr.sortingOrder = 1;
+        } else if (GetState ()) {
             sr.color = new Color (0f, 0.79f, 0.09f);
         } else {
             sr.color = new Color (0f, 0.494f, 0.0588f);

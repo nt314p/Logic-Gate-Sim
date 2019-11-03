@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class SimulationManager : MonoBehaviour {
 
-        public static GameObject wire;
+    private static SimulationManager instance = null;
+    public static GameObject wire;
     public static GameObject LED;
     public static GameObject Switch;
     private List<GameObject> wiresInPath;
@@ -12,11 +13,13 @@ public class SimulationManager : MonoBehaviour {
     public bool drawingWirePath;
     private string selectedPart;
     private Circuit currentCircuit;
+    private List<Part> selectedParts;
     public int width;
     public int height;
 
     // Start is called before the first frame update
     void Start () {
+        instance = this;
         wire = (GameObject) Resources.Load ("Prefabs/Wire", typeof (GameObject));
         LED = (GameObject) Resources.Load ("Prefabs/LED", typeof (GameObject));
         Switch = (GameObject) Resources.Load ("Prefabs/Switch", typeof (GameObject));
@@ -25,6 +28,7 @@ public class SimulationManager : MonoBehaviour {
         wiresInPath = new List<GameObject> ();
         drawingWirePath = false;
         selectedPart = "";
+        selectedParts = new List<Part> ();
 
         currentCircuit = new Circuit (GridController.width, GridController.height);
         currentCircuit.RecalculateIds ();
@@ -100,7 +104,7 @@ public class SimulationManager : MonoBehaviour {
             wiresInPath = new List<GameObject> (); // resetting variables
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;
-            
+
         }
     }
 
@@ -110,6 +114,22 @@ public class SimulationManager : MonoBehaviour {
 
     public Circuit GetCircuit () {
         return currentCircuit;
+    }
+
+    public bool ToggleSelected (Part p) {
+        if (selectedParts.Contains (p)) {
+            selectedParts.Remove (p);
+            return false;
+        } else {
+            selectedParts.Add (p);
+            return true;
+        }
+    }
+
+    public void ClearSelected () {
+        while (selectedParts.Count != 0) {
+            selectedParts[0].SetSelected(false);
+        }
     }
 
     private static Vector3 ToVector3 (Vector2Int vec) {
@@ -158,6 +178,10 @@ public class SimulationManager : MonoBehaviour {
         Vector2Int clamped = new Vector2Int (vec.x, vec.y);
         clamped.Clamp (Vector2Int.zero, new Vector2Int (49, 49));
         return clamped.Equals (vec);
+    }
+
+    public static SimulationManager sim () {
+        return instance;
     }
 
 }

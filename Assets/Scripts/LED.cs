@@ -33,4 +33,8 @@ public class LED : Part {
     public override void OnStateUpdate () {
         UpdateColor ();
     }
+
+    public override void OnSelectUpdate() {
+        throw new System.NotImplementedException();
+    }
 }

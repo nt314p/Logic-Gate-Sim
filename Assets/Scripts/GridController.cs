@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class GridController : MonoBehaviour {
     public static int width = 30;
@@ -15,9 +16,16 @@ public class GridController : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        gridMat.mainTextureScale = new Vector2(width, height);
-        gridPlane.transform.localScale = new Vector3(width/10f, 1, height/10f);
-        gridPlane.transform.position = new Vector3(width * 0.5f - 0.5f, height * 0.5f - 0.5f, 0);
+        gridMat.mainTextureScale = new Vector2 (width, height);
+        gridPlane.transform.localScale = new Vector3 (2.34375f, 2.34375f, 1);
+        // gridPlane.transform.position = new Vector3 (width * 0.5f - 0.5f, height * 0.5f - 0.5f, 0);
+        gridPlane.transform.position = new Vector3 (-0.5f, height - 0.5f, 0);
+
+    }
+
+    void OnMouseDown () {
+        Debug.Log ("MDPLANE!");
+        SimulationManager.sim ().ClearSelected ();
     }
 
     public void SetWidth (int width) {
