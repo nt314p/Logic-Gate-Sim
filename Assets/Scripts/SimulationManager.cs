@@ -8,6 +8,7 @@ public class SimulationManager : MonoBehaviour {
     public static GameObject wire;
     public static GameObject LED;
     public static GameObject Switch;
+    public static GameObject Button;
     private List<GameObject> wiresInPath;
     private List<Vector2Int> wirePath;
     public bool drawingWirePath;
@@ -17,12 +18,20 @@ public class SimulationManager : MonoBehaviour {
     public int width;
     public int height;
 
+    Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string> {
+        {KeyCode.W, "wire"},
+        {KeyCode.L, "led"},
+        {KeyCode.S, "switch"},
+        {KeyCode.B, "button"}
+    };
+
     // Start is called before the first frame update
     void Start () {
         instance = this;
         wire = (GameObject) Resources.Load ("Prefabs/Wire", typeof (GameObject));
         LED = (GameObject) Resources.Load ("Prefabs/LED", typeof (GameObject));
         Switch = (GameObject) Resources.Load ("Prefabs/Switch", typeof (GameObject));
+        Button = (GameObject) Resources.Load ("Prefabs/Button", typeof (GameObject));
 
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
@@ -36,13 +45,14 @@ public class SimulationManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        if (Input.GetKey (KeyCode.W)) {
-            selectedPart = "wire";
-        } else if (Input.GetKey (KeyCode.L)) {
-            selectedPart = "led";
-        } else if (Input.GetKey (KeyCode.S)) {
-            selectedPart = "switch";
-        } else {
+        bool pressed = false;
+        foreach (KeyValuePair<KeyCode, string> entry in keybinds) {
+            if (Input.GetKey(entry.Key)) {
+                selectedPart = entry.Value;
+                pressed = true;
+            }
+        }
+        if (!pressed) {
             selectedPart = "";
         }
 
@@ -64,6 +74,9 @@ public class SimulationManager : MonoBehaviour {
                     break;
                 case "switch":
                     currentCircuit.AddNode (Switch, coord);
+                    break;
+                case "button":
+                    currentCircuit.AddNode (Button, coord);
                     break;
                 default:
                     break;
@@ -128,7 +141,7 @@ public class SimulationManager : MonoBehaviour {
 
     public void ClearSelected () {
         while (selectedParts.Count != 0) {
-            selectedParts[0].SetSelected(false);
+            selectedParts[0].SetSelected (false);
         }
     }
 
