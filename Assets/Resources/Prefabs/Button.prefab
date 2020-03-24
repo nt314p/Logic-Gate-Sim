@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6005799437256952157}
   - component: {fileID: 6005799437256952154}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Toggle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   - component: {fileID: 6005799438825312333}
   - component: {fileID: 6005799438825312332}
   - component: {fileID: 6005799438825312331}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -133,6 +133,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Switch
       objectReference: {fileID: 0}
+    - target: {fileID: 3563653744314743139, guid: de06d5f50953d76438d12192dc312f65,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3563653744314743140, guid: de06d5f50953d76438d12192dc312f65,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -210,8 +215,9 @@ GameObject:
   m_Component:
   - component: {fileID: 512133554}
   - component: {fileID: 512133555}
-  - component: {fileID: 512133552}
   - component: {fileID: 512133553}
+  - component: {fileID: 512133552}
+  - component: {fileID: 512133556}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -219,21 +225,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!212 &512133552
-SpriteRenderer:
+--- !u!23 &512133552
+MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 512133551}
   m_Enabled: 1
-  m_CastShadows: 0
+  m_CastShadows: 1
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
+  m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -250,7 +256,7 @@ SpriteRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -258,17 +264,6 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3fab316393a793e4f869d83263a241ba, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 2
-  m_Size: {x: 12.8, y: 12.8}
-  m_AdaptiveModeThreshold: 1
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
 --- !u!61 &512133553
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -321,6 +316,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71b5f15151e6f9348a188850807107d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!33 &512133556
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 512133551}
+  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &533715312
 GameObject:
   m_ObjectHideFlags: 0
@@ -621,8 +624,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawingWirePath: 0
-  width: 0
-  height: 0
 --- !u!1 &1809818881
 GameObject:
   m_ObjectHideFlags: 0
@@ -717,6 +718,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 6005799437256952156, guid: 4039e5312e5878e49ab9b51649d0fa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 6005799438825312330, guid: 4039e5312e5878e49ab9b51649d0fa12,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -776,6 +782,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 6005799438825312335, guid: 4039e5312e5878e49ab9b51649d0fa12,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6005799438825312335, guid: 4039e5312e5878e49ab9b51649d0fa12,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4039e5312e5878e49ab9b51649d0fa12, type: 3}

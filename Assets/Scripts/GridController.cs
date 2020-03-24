@@ -12,15 +12,16 @@ public class GridController : MonoBehaviour {
     void Start () {
         gridPlane = this.gameObject;
         gridMat = gridPlane.GetComponent<Renderer> ().material;
+
+        gridMat.mainTextureScale = new Vector2 (width, height);
+        gridPlane.transform.localScale = new Vector3 (width, height, 1);
+        // gridPlane.transform.position = new Vector3 (width * 0.5f - 0.5f, height * 0.5f - 0.5f, 0);
+        gridPlane.transform.position = new Vector3 (width/2f - 0.5f, height/2f - 0.5f, 0);
     }
 
     // Update is called once per frame
     void Update () {
-        gridMat.mainTextureScale = new Vector2 (width, height);
-        gridPlane.transform.localScale = new Vector3 (2.34375f, 2.34375f, 1);
-        // gridPlane.transform.position = new Vector3 (width * 0.5f - 0.5f, height * 0.5f - 0.5f, 0);
-        gridPlane.transform.position = new Vector3 (-0.5f, height - 0.5f, 0);
-
+        
     }
 
     void OnMouseDown () {

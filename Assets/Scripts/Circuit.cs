@@ -175,7 +175,7 @@ public class Circuit {
         }
     }
 
-    private void AddPart (Part p) {
+    private void AddPart (Part p) { // remove else ifs
         Vector2Int coords = p.GetCoords ();
         if (p is Wire) {
             Wire w = (Wire) p;
@@ -193,6 +193,10 @@ public class Circuit {
             Switch sw = (Switch) p;
             partsGrid[coords.x, coords.y].SetNode (sw);
             Debug.Log ("ADDED A SWITCH!");
+        } else if (p is Button) {
+            Button b = (Button) p;
+            partsGrid[coords.x, coords.y].SetNode (b);
+            Debug.Log ("ADDED A BUTTON!");
         }
         AddPartToDict (p);
     }

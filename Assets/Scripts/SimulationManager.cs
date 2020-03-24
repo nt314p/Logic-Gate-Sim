@@ -15,8 +15,6 @@ public class SimulationManager : MonoBehaviour {
     private string selectedPart;
     private Circuit currentCircuit;
     private List<Part> selectedParts;
-    public int width;
-    public int height;
 
     Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string> {
         {KeyCode.W, "wire"},
@@ -27,11 +25,13 @@ public class SimulationManager : MonoBehaviour {
 
     // Start is called before the first frame update
     void Start () {
+        Application.targetFrameRate = 60;
         instance = this;
         wire = (GameObject) Resources.Load ("Prefabs/Wire", typeof (GameObject));
         LED = (GameObject) Resources.Load ("Prefabs/LED", typeof (GameObject));
         Switch = (GameObject) Resources.Load ("Prefabs/Switch", typeof (GameObject));
         Button = (GameObject) Resources.Load ("Prefabs/Button", typeof (GameObject));
+        Debug.Log(Button);
 
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
@@ -117,7 +117,6 @@ public class SimulationManager : MonoBehaviour {
             wiresInPath = new List<GameObject> (); // resetting variables
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;
-
         }
     }
 

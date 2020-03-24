@@ -5,11 +5,13 @@ using UnityEngine;
 public class Button : Part {
 
     private SpriteRenderer toggleSR;
-    // Start is called before the first frame update
-    void Start () {
+    
+    void Awake () {
         // get the toggle sprite renderer
         toggleSR = GameObject.Find ("/" + this.gameObject.name + "/Toggle").GetComponent<SpriteRenderer> ();
-        Debug.Log (toggleSR);
+
+        SetState (false);
+        SetIsActive(true);
     }
 
     // Update is called once per frame
@@ -28,6 +30,10 @@ public class Button : Part {
 
     void OnMouseUpAsButton () {
         SetState (false); // untoggle button
+        GetSim ().GetCircuit ().CalculateStateId (GetId ()); // fix this sketchy code
+        // perhaps add a "updated" boolean that is set if the state has been updated
+        // then the Circuit iterates through active parts and sees if any parts have been updated
+        // if so, then update the part (and its corresponding ids)
     }
 
     public override void OnSelectUpdate () {
