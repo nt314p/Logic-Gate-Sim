@@ -12,7 +12,6 @@ public class CameraController : MonoBehaviour {
     private Vector3 targetPos;
     private Vector3 dragOrigin, oldPos;
 
-    // Start is called before the first frame update
     void Start () {
         Camera.main.orthographicSize = initZoom;
         zoom = initZoom;

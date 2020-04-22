@@ -15,9 +15,9 @@ public class LED : Part {
 
     public void UpdateColor () {
         if (GetState ()) {
-            sr.color = new Color (0f, 0.79f, 0.09f);
+            sr.color = Part.colorActive;
         } else {
-            sr.color = new Color (0f, 0.494f, 0.0588f);
+            sr.color = Part.colorInactive;
         }
     }
 

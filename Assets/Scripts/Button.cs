@@ -42,9 +42,9 @@ public class Button : Part {
 
     public override void OnStateUpdate () {
         if (GetState ()) {
-            toggleSR.color = new Color (0f, 0.7882353f, 0.0902f); // bright green
+            toggleSR.color = Part.colorActive;
         } else {
-            toggleSR.color = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
+            toggleSR.color = Part.colorInactive;
         }
     }
 }
