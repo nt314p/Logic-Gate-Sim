@@ -16,7 +16,7 @@ public class SimulationManager : MonoBehaviour {
     private Circuit currentCircuit;
     private List<Part> selectedParts;
 
-    Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string> {
+    public Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string> {
         {KeyCode.W, "wire"},
         {KeyCode.L, "led"},
         {KeyCode.S, "switch"},

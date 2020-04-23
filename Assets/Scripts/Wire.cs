@@ -7,6 +7,7 @@ public class Wire : Part {
     private Vector2Int endPoint;
     private bool vertical;
     private SpriteRenderer sr;
+    private readonly float len = 1.38f;
 
     void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
@@ -38,14 +39,13 @@ public class Wire : Part {
         SetCoords (start);
         endPoint = end;
 
-        if (start.x == end.x) {
-            vertical = true;
-            this.transform.localScale = new Vector3 (1.38f, 13.8f, 1);
-            this.transform.position = new Vector3 (GetCoords ().x, GetCoords ().y + 0.5f, -0.01f);
-        } else {
-            this.transform.localScale = new Vector3 (13.8f, 1.38f, 1);
-            this.transform.position = new Vector3 (GetCoords ().x + 0.5f, GetCoords ().y, -0.01f);
-        }
+        Vector3 direction;
+        vertical = start.x == end.x;
+        direction = vertical ? Vector3.up : Vector3.right;
+
+        this.transform.localScale = new Vector3 (len, len, 1) + direction * 9 * len;
+        this.transform.position = new Vector3 (GetCoords ().x, GetCoords ().y, -0.01f) + direction * 0.5f;
+        Debug.Log (this.transform.position);
     }
 
     public void Initialize (Vector2Int start, Vector2Int end) {
@@ -65,9 +65,9 @@ public class Wire : Part {
             sr.color = new Color (0.67f, 0.89f, 0f);
             sr.sortingOrder = 1;
         } else if (GetState ()) {
-            sr.color = new Color (0f, 0.79f, 0.09f);
+            sr.color = Part.colorActive;
         } else {
-            sr.color = new Color (0f, 0.494f, 0.0588f);
+            sr.color = Part.colorInactive;
         }
     }
 

@@ -41,10 +41,6 @@ public class Button : Part {
     }
 
     public override void OnStateUpdate () {
-        if (GetState ()) {
-            toggleSR.color = Part.colorActive;
-        } else {
-            toggleSR.color = Part.colorInactive;
-        }
+        toggleSR.color = GetState() ? Part.colorActive : Part.colorInactive;
     }
 }

@@ -9,8 +9,8 @@ public abstract class Part : MonoBehaviour {
     private Vector2Int coords;
     private bool isActive; // state cannot be changed externally
     private bool isSelected;
-    public static Color colorActive = new Color (0f, 0.7882353f, 0.0902f); // bright green
-    public static Color colorInactive = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
+    public readonly static Color colorActive = new Color (0f, 0.7882353f, 0.0902f); // bright green
+    public readonly static Color colorInactive = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
 
     public int GetId () {
         return id;

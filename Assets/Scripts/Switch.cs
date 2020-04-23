@@ -6,30 +6,27 @@ public class Switch : Part {
 
     private Transform toggle;
     private float currY;
-    private float tarY;
+    private float targetY;
+    private readonly float offset = 0.015f;
+    private readonly float targetTolerance = 0.002f;
+    private readonly float toggleSpeed = 0.14f;
 
     void Awake () {
-        tarY = -0.015f;
-        currY = tarY;
-        Transform[] transforms = gameObject.GetComponentsInChildren<Transform>();
-        for (int i = 0; i < transforms.Length; i++) {
-            if (transforms[i].gameObject.name.Equals("Toggle")) {
-                toggle = transforms[i];
-                break;
-            }
-        }
+        targetY = -offset;
+        currY = targetY;
+        toggle = transform.Find("Toggle");
         SetState (false);
         SetIsActive(true);
     }
 
     // Update is called once per frame
     void Update () {
-        toggle.localPosition = new Vector3 (0, currY, 0);
-        if (currY != tarY) {
-            currY += 0.14f * Time.deltaTime * -Mathf.Sign (currY - tarY);
-        }
-        if (Mathf.Abs(currY - tarY) < 0.002f) {
-            currY = Mathf.Sign(currY) * 0.015f;
+        toggle.localPosition = Vector3.up * currY; // new Vector3(0, currY, 0); 
+
+        if (Mathf.Abs(currY - targetY) < targetTolerance) {
+            currY = Mathf.Sign(currY) * offset;
+        } else {
+            currY += toggleSpeed * Time.deltaTime * -Mathf.Sign (currY - targetY);
         }
     }
 
@@ -43,13 +40,7 @@ public class Switch : Part {
     }
 
     public override void OnStateUpdate () {
-        if (GetState ()) {
-            // toggle.transform.localPosition = new Vector3 (0, 0.015f, -0.01f);
-            tarY = 0.015f;
-        } else {
-            // toggle.transform.localPosition = new Vector3 (0, -0.015f, -0.01f);
-            tarY = -0.015f;
-        }
+        targetY = offset * (GetState() ? 1 : -1);
     }
 
     public void UpdateState () {

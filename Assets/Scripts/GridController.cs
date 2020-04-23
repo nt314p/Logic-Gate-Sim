@@ -24,7 +24,7 @@ public class GridController : MonoBehaviour {
     }
 
     void OnMouseDown () {
-        Debug.Log ("MDPLANE!");
+        Debug.Log ("Mouse down on plane!");
         SimulationManager.sim ().ClearSelected ();
     }
 
