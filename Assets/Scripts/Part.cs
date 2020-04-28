@@ -11,7 +11,7 @@ public abstract class Part : MonoBehaviour {
     private bool isSelected;
     public readonly static Color colorActive = new Color (0f, 0.7882353f, 0.0902f); // bright green
     public readonly static Color colorInactive = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
-
+    public readonly static Color colorSelected = new Color (0.4478532f, 0.8867924f, 0f); // another bright green
     public int GetId () {
         return id;
     }
@@ -52,7 +52,7 @@ public abstract class Part : MonoBehaviour {
     public void SetSelected (bool isSelected) {
         this.isSelected = isSelected;
         OnSelectUpdate ();
-        GetSim().ToggleSelected(this);
+        GetSim ().ToggleSelected (this);
     }
 
     public abstract void OnStateUpdate ();
@@ -60,7 +60,7 @@ public abstract class Part : MonoBehaviour {
     public abstract void OnSelectUpdate ();
 
     public override string ToString () {
-        return "Type: " + this.GetType () + "| Part Id: " + id;
+        return "Type: " + this.GetType () + "; Part Id: " + id;
     }
 
     public SimulationManager GetSim () {

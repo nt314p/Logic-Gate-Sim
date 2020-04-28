@@ -9,16 +9,12 @@ public class LED : Part {
     void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
         SetState (false);
-        SetIsActive(false);
+        SetIsActive (false);
         UpdateColor ();
     }
 
     public void UpdateColor () {
-        if (GetState ()) {
-            sr.color = Part.colorActive;
-        } else {
-            sr.color = Part.colorInactive;
-        }
+        sr.color = GetState () ? Part.colorActive : Part.colorInactive;
     }
 
     void OnMouseDown () {
@@ -34,7 +30,7 @@ public class LED : Part {
         UpdateColor ();
     }
 
-    public override void OnSelectUpdate() {
-        throw new System.NotImplementedException();
+    public override void OnSelectUpdate () {
+        throw new System.NotImplementedException ();
     }
 }

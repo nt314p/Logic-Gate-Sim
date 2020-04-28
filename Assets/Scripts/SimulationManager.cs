@@ -16,11 +16,10 @@ public class SimulationManager : MonoBehaviour {
     private Circuit currentCircuit;
     private List<Part> selectedParts;
 
-    public Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string> {
-        {KeyCode.W, "wire"},
-        {KeyCode.L, "led"},
-        {KeyCode.S, "switch"},
-        {KeyCode.B, "button"}
+    public Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string> { { KeyCode.W, "wire" },
+        { KeyCode.L, "led" },
+        { KeyCode.S, "switch" },
+        { KeyCode.B, "button" }
     };
 
     // Start is called before the first frame update
@@ -31,7 +30,7 @@ public class SimulationManager : MonoBehaviour {
         LED = (GameObject) Resources.Load ("Prefabs/LED", typeof (GameObject));
         Switch = (GameObject) Resources.Load ("Prefabs/Switch", typeof (GameObject));
         Button = (GameObject) Resources.Load ("Prefabs/Button", typeof (GameObject));
-        Debug.Log(Button);
+        Debug.Log (Button);
 
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();
@@ -47,7 +46,7 @@ public class SimulationManager : MonoBehaviour {
     void Update () {
         bool pressed = false;
         foreach (KeyValuePair<KeyCode, string> entry in keybinds) {
-            if (Input.GetKey(entry.Key)) {
+            if (Input.GetKey (entry.Key)) {
                 selectedPart = entry.Value;
                 pressed = true;
             }
@@ -131,11 +130,10 @@ public class SimulationManager : MonoBehaviour {
     public bool ToggleSelected (Part p) {
         if (selectedParts.Contains (p)) {
             selectedParts.Remove (p);
-            return false;
         } else {
             selectedParts.Add (p);
-            return true;
         }
+        return !selectedParts.Contains (p);
     }
 
     public void ClearSelected () {
