@@ -26,11 +26,10 @@ public class SimulationManager : MonoBehaviour {
     void Start () {
         Application.targetFrameRate = 60;
         instance = this;
-        wire = (GameObject) Resources.Load ("Prefabs/Wire", typeof (GameObject));
-        LED = (GameObject) Resources.Load ("Prefabs/LED", typeof (GameObject));
-        Switch = (GameObject) Resources.Load ("Prefabs/Switch", typeof (GameObject));
-        Button = (GameObject) Resources.Load ("Prefabs/Button", typeof (GameObject));
-        Debug.Log (Button);
+        wire = Resources.Load ("Prefabs/Wire") as GameObject;
+        LED = Resources.Load("Prefabs/LED") as GameObject;
+        Switch = Resources.Load ("Prefabs/Switch") as GameObject;
+        Button = Resources.Load ("Prefabs/Button") as GameObject;
 
         wirePath = new List<Vector2Int> ();
         wiresInPath = new List<GameObject> ();

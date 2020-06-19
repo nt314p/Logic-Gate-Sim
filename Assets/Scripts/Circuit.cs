@@ -31,7 +31,7 @@ public class Circuit {
     public void RebuildIds () { // full rebuild
         // assume that parts dictionary (which contains ids and lists of parts) is valid
         List<Part> allParts = parts.SelectMany (x => x.Value).ToList ();
-        allParts.ForEach(p => p.SetId(-1)); // clearing ids
+        allParts.ForEach (p => p.SetId (-1)); // clearing ids
 
         // foreach ()
     }
@@ -52,8 +52,8 @@ public class Circuit {
 
         for (int i = 0; i < partsGrid.GetLength (0); i++) {
             for (int j = 0; j < partsGrid.GetLength (1); j++) { // iterating through 2d grid
-                Wire left = GetLeft (i, j);
-                Wire bottom = GetBottom (i, j);
+                Wire left = GetWire (new Vector2Int (i, j), Vector2Int.left);
+                Wire bottom = GetWire (new Vector2Int (i, j), Vector2Int.down);
 
                 int nodeId = -2; // the id at the node (i, j)
                 if (left == null && bottom == null) {
@@ -84,8 +84,8 @@ public class Circuit {
                     }
                 }
 
-                Wire top = partsGrid[i, j].GetTop ();
-                Wire right = partsGrid[i, j].GetRight ();
+                Wire top = partsGrid[i, j].GetWire (Vector2Int.up);
+                Wire right = partsGrid[i, j].GetWire (Vector2Int.right);
 
                 if (top != null || right != null) {
                     nextId++;
@@ -116,43 +116,42 @@ public class Circuit {
         }
     }
 
+    // calculates the state of an id based on the states of its active components
     public void CalculateStateId (int id) {
         bool state = false;
         foreach (Part p in parts[id]) {
-            if (!p.IsActive ()) // end of active parts
-                break;
+            if (!p.IsActive () || state) break; // end of active parts or state = true -> can't be made false
             state |= p.GetState ();
         }
         SetAllOfId (id, state);
     }
 
     public void ReplaceId (int oldId, int newId) {
-        parts[newId] = parts[oldId];
-        if (oldId != newId) {
-            parts.Remove (oldId);
+        if (oldId == newId) return;
+        parts[newId] = parts[oldId]; // set list reference in dict to new id
+        parts.Remove (oldId);
+        parts[newId].ForEach (p => p.SetId (newId));
+    }
+
+    // links all part ids passed in
+    public void LinkIds (Part[] parts) {
+        int[] validPartIds = parts.Where (p => p != null).Select (p => p.GetId ()).ToArray ();
+        for (int i = 1; i < validPartIds.Length; ++i) {
+            ReplaceId (validPartIds[i], validPartIds[0]); // link other ids to first id
         }
-        parts[newId].ForEach(p => p.SetId(newId));
     }
 
     public List<Part> GetAllOfId (int id) {
         return parts[id];
     }
 
-    // soft set all, ignores active components
-    public void SetAllOfId (int id, bool state) {
-        GetAllOfId (id)
-            .Where(p => !p.IsActive())
-            .ToList()
-            .ForEach(p => p.SetState(state));
-    }
-
-    // hard set all, sets ALL components
-    public void SetAllOfId (int id, bool state, bool hardSet) {
-        if (hardSet) { // hard set
-            GetAllOfId (id).ForEach(p => p.SetState(state));
-        } else { // soft set
-            SetAllOfId (id, state);
+    // hard set all, sets ALL components, soft set will ignore active components
+    public void SetAllOfId (int id, bool state, bool hardSet = false) {
+        List<Part> editParts = GetAllOfId (id);
+        if (!hardSet) { // soft set filters out active parts
+            editParts = editParts.Where (p => !p.IsActive ()).ToList ();
         }
+        editParts.ForEach (p => p.SetState (state));
     }
 
     public void AddNode (GameObject nodeObj, Vector2Int coords) {
@@ -182,11 +181,7 @@ public class Circuit {
         Vector2Int coords = p.GetCoords ();
         if (p is Wire) {
             Wire w = (Wire) p;
-            if (w.IsVertical ()) {
-                partsGrid[coords.x, coords.y].SetTop (w);
-            } else {
-                partsGrid[coords.x, coords.y].SetRight (w);
-            }
+            partsGrid[coords.x, coords.y].SetWire (w, w.GetOrientation ());
         } else {
             partsGrid[coords.x, coords.y].SetNode (p);
             Debug.Log ("Added " + p.GetType ().ToString ());
@@ -238,18 +233,18 @@ public class Circuit {
         return idExists && part.GetId () != newId; // prevent infinite loops
     }
 
-    private static Vector3 ToVector3 (Vector2Int vec) {
-        return new Vector3 (vec.x, vec.y, 0);
+    private static Vector3 ToVector3 (Vector2Int vecInt) {
+        return (Vector3) (Vector2) vecInt;
     }
 
-    private Wire GetLeft (int x, int y) {
-        if (x == 0) return null;
-        return partsGrid[x - 1, y].GetRight ();
+    // gets a wire based on direction from the part grid
+    private Wire GetWire (Vector2Int coord, Vector2Int direction) {
+        if (coord.x == 0 || coord.y == 0) return null;
+        if (direction.x == -1 || direction.y == -1) { // left or bottom
+            Vector2Int shifted = coord + direction;
+            return partsGrid[shifted.x, shifted.y].GetWire (-direction);
+        } else { // top or right
+            return partsGrid[coord.x, coord.y].GetWire (direction);
+        }
     }
-
-    private Wire GetBottom (int x, int y) {
-        if (y == 0) return null;
-        return partsGrid[x, y - 1].GetTop ();
-    }
-
 }
