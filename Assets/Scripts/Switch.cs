@@ -14,17 +14,17 @@ public class Switch : Part {
     void Awake () {
         targetY = -offset;
         currY = targetY;
-        toggle = transform.Find("Toggle");
-        SetState (false);
-        SetIsActive(true);
+        toggle = transform.Find ("Toggle");
+        State = false;
+        SetIsActive (true);
     }
 
     // Update is called once per frame
     void Update () {
         toggle.localPosition = Vector3.up * currY; // new Vector3(0, currY, 0); 
 
-        if (Mathf.Abs(currY - targetY) < targetTolerance) {
-            currY = Mathf.Sign(currY) * offset;
+        if (Mathf.Abs (currY - targetY) < targetTolerance) {
+            currY = Mathf.Sign (currY) * offset;
         } else {
             currY += toggleSpeed * Time.deltaTime * -Mathf.Sign (currY - targetY);
         }
@@ -32,22 +32,22 @@ public class Switch : Part {
 
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
-            SetState (!GetState ());
-            GetSim().GetCircuit().CalculateStateId(GetId());
+            State = !State;
+            GetSim ().GetCircuit ().CalculateStateId (Id);
         } else {
             Debug.Log ("clicked " + this.ToString ());
         }
     }
 
     public override void OnStateUpdate () {
-        targetY = offset * (GetState() ? 1 : -1);
+        targetY = offset * (State ? 1 : -1);
     }
 
     public void UpdateState () {
 
     }
 
-    public override void OnSelectUpdate() {
-        throw new System.NotImplementedException();
+    public override void OnSelectUpdate () {
+        throw new System.NotImplementedException ();
     }
 }

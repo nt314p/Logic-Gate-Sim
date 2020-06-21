@@ -11,7 +11,7 @@ public class Wire : Part {
 
     void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
-        SetState (false);
+        State = false;
         SetIsActive (false);
         UpdateColor ();
     }
@@ -27,7 +27,7 @@ public class Wire : Part {
     }
 
     public void Initialize (Vector2Int start, Vector2Int end, int id) {
-        SetId (id);
+        Id = id;
 
         if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x)) {
             Vector2Int tmp = start; // swapping if start is not the min value
@@ -59,12 +59,10 @@ public class Wire : Part {
 
     public void UpdateColor () {
         if (IsSelected ()) {
-            sr.color = Part.colorSelected;
+            sr.color = Part.ColorSelected;
             sr.sortingOrder = 1;
-        } else if (GetState ()) {
-            sr.color = Part.colorActive;
         } else {
-            sr.color = Part.colorInactive;
+            sr.color = State ? Part.ColorActive : Part.ColorInactive;
         }
     }
 

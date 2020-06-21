@@ -8,13 +8,13 @@ public class LED : Part {
 
     void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
-        SetState (false);
+        State = false;
         SetIsActive (false);
         UpdateColor ();
     }
 
     public void UpdateColor () {
-        sr.color = GetState () ? Part.colorActive : Part.colorInactive;
+        sr.color = State ? Part.ColorActive : Part.ColorInactive;
     }
 
     void OnMouseDown () {

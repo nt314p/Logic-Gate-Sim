@@ -9,24 +9,15 @@ public abstract class Part : MonoBehaviour {
     private Vector2Int coords;
     private bool isActive; // state cannot be changed externally
     private bool isSelected;
-    public readonly static Color colorActive = new Color (0f, 0.7882353f, 0.0902f); // bright green
-    public readonly static Color colorInactive = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
-    public readonly static Color colorSelected = new Color (0.4478532f, 0.8867924f, 0f); // another bright green
-    public int GetId () {
-        return id;
-    }
+    public readonly static Color ColorActive = new Color (0f, 0.7882353f, 0.0902f); // bright green
+    public readonly static Color ColorInactive = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
+    public readonly static Color ColorSelected = new Color (0.4478532f, 0.8867924f, 0f); // another bright green
 
-    public void SetId (int id) {
-        this.id = id;
-    }
+    public int Id { get; set; }
 
-    public bool GetState () {
-        return state;
-    }
-
-    public void SetState (bool state) {
-        this.state = state;
-        OnStateUpdate ();
+    public bool State { 
+        get { return this.state; } 
+        set { this.state = value; OnStateUpdate (); } 
     }
 
     public Vector2Int GetCoords () {

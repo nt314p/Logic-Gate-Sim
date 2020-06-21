@@ -31,7 +31,7 @@ public class Circuit {
     public void RebuildIds () { // full rebuild
         // assume that parts dictionary (which contains ids and lists of parts) is valid
         List<Part> allParts = parts.SelectMany (x => x.Value).ToList ();
-        allParts.ForEach (p => p.SetId (-1)); // clearing ids
+        allParts.ForEach (p => p.Id = -1); // clearing ids
 
         // foreach ()
     }
@@ -44,7 +44,7 @@ public class Circuit {
             for (int j = 0; j < partsGrid.GetLength (1); j++) {
                 for (int k = 0; k < 2; k++) {
                     if (partsGrid[i, j].GetParts () [k] != null) {
-                        partsGrid[i, j].GetParts () [k].SetId (-1);
+                        partsGrid[i, j].GetParts () [k].Id = -1;
                     }
                 }
             }
@@ -59,8 +59,8 @@ public class Circuit {
                 if (left == null && bottom == null) {
                     nodeId = nextId;
                 } else if (left != null && bottom != null) {
-                    nodeId = left.GetId ();
-                    List<Part> bottomPathParts = GetAllOfId (bottom.GetId ()); // getting bottom path
+                    nodeId = left.Id;
+                    List<Part> bottomPathParts = GetAllOfId (bottom.Id); // getting bottom path
                     for (int k = 0; k < bottomPathParts.Count; k++) { // iterating through bottom path parts
                         Part p = bottomPathParts[k];
 
@@ -71,9 +71,9 @@ public class Circuit {
                         }
                     }
                 } else if (left == null) { // left null, bottom not null
-                    nodeId = bottom.GetId ();
+                    nodeId = bottom.Id;
                 } else { // left not null, bottom null
-                    nodeId = left.GetId ();
+                    nodeId = left.Id;
                 }
 
                 Part[] nodeParts = partsGrid[i, j].GetParts ();
@@ -121,7 +121,7 @@ public class Circuit {
         bool state = false;
         foreach (Part p in parts[id]) {
             if (!p.IsActive () || state) break; // end of active parts or state = true -> can't be made false
-            state |= p.GetState ();
+            state |= p.State;
         }
         SetAllOfId (id, state);
     }
@@ -130,15 +130,20 @@ public class Circuit {
         if (oldId == newId) return;
         parts[newId] = parts[oldId]; // set list reference in dict to new id
         parts.Remove (oldId);
-        parts[newId].ForEach (p => p.SetId (newId));
+        parts[newId].ForEach (p => p.Id = newId);
     }
 
     // links all part ids passed in
     public void LinkIds (Part[] parts) {
-        int[] validPartIds = parts.Where (p => p != null).Select (p => p.GetId ()).ToArray ();
+        int[] validPartIds = parts.Where (p => p != null).Select (p => p.Id).ToArray ();
         for (int i = 1; i < validPartIds.Length; ++i) {
             ReplaceId (validPartIds[i], validPartIds[0]); // link other ids to first id
         }
+    }
+
+    public Wire[] GetWiresFromDirection (Vector2Int coords, Vector2Int direction, bool ignoreConnected) {
+        float angle = Mathf.Atan2 (direction.y, direction.x);
+        return null;
     }
 
     public List<Part> GetAllOfId (int id) {
@@ -151,14 +156,14 @@ public class Circuit {
         if (!hardSet) { // soft set filters out active parts
             editParts = editParts.Where (p => !p.IsActive ()).ToList ();
         }
-        editParts.ForEach (p => p.SetState (state));
+        editParts.ForEach (p => p.State = state);
     }
 
     public void AddNode (GameObject nodeObj, Vector2Int coords) {
         GameObject tempObj = MonoBehaviour.Instantiate (nodeObj, ToVector3 (coords), Quaternion.identity);
         Part nodePart = tempObj.GetComponent<Part> ();
         nodePart.SetCoords (coords);
-        nodePart.SetId (nextId);
+        nodePart.Id = nextId;
         AddPart (nodePart);
         nextId++;
         RecalculateIds ();
@@ -166,7 +171,7 @@ public class Circuit {
 
     public void AddWires (List<Wire> wires) {
         foreach (Wire w in wires) {
-            w.SetId (nextId);
+            w.Id = nextId;
             AddPart (w);
         }
 
@@ -205,7 +210,7 @@ public class Circuit {
     }
 
     private void AddPartToDict (Part part) {
-        int partId = part.GetId ();
+        int partId = part.Id;
         if (partId == -2 || partId == -1) {
             Debug.Log ("POTATS! partId is: " + partId);
         }
@@ -223,14 +228,14 @@ public class Circuit {
     }
 
     private bool UpdatePartIdInDict (Part part, int newId) {
-        bool idExists = parts.ContainsKey (part.GetId ());
+        bool idExists = parts.ContainsKey (part.Id);
         if (idExists) {
-            List<Part> partsOfId = parts[part.GetId ()];
+            List<Part> partsOfId = parts[part.Id];
             partsOfId.Remove (part);
         }
-        part.SetId (newId);
+        part.Id = newId;
         AddPartToDict (part);
-        return idExists && part.GetId () != newId; // prevent infinite loops
+        return idExists && part.Id != newId; // prevent infinite loops
     }
 
     private static Vector3 ToVector3 (Vector2Int vecInt) {

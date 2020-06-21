@@ -10,7 +10,7 @@ public class Button : Part {
         // get the toggle sprite renderer
         toggleSR = GameObject.Find ("/" + this.gameObject.name + "/Toggle").GetComponent<SpriteRenderer> ();
 
-        SetState (false);
+        State = false;
         SetIsActive(true);
     }
 
@@ -21,16 +21,16 @@ public class Button : Part {
 
     void OnMouseDown () {
         if (Input.GetKey (KeyCode.LeftControl)) {
-            SetState (true);
-            GetSim ().GetCircuit ().CalculateStateId (GetId ());
+            State = true;
+            GetSim ().GetCircuit ().CalculateStateId (Id);
         } else {
             Debug.Log ("clicked " + this.ToString ());
         }
     }
 
     void OnMouseUpAsButton () {
-        SetState (false); // untoggle button
-        GetSim ().GetCircuit ().CalculateStateId (GetId ()); // fix this sketchy code
+        State = false; // untoggle button
+        GetSim ().GetCircuit ().CalculateStateId (Id); // fix this sketchy code
         // perhaps add a "updated" boolean that is set if the state has been updated
         // then the Circuit iterates through active parts and sees if any parts have been updated
         // if so, then update the part (and its corresponding ids)
@@ -41,6 +41,6 @@ public class Button : Part {
     }
 
     public override void OnStateUpdate () {
-        toggleSR.color = GetState() ? Part.colorActive : Part.colorInactive;
+        toggleSR.color = State ? Part.ColorActive : Part.ColorInactive;
     }
 }

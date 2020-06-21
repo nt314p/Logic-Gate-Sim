@@ -28,7 +28,7 @@
      }
 
      public Part GetNode () {
-        return node;
+         return node;
      }
 
      public Wire[] GetWires () {
