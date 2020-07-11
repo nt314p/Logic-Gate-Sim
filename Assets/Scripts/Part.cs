@@ -7,43 +7,42 @@ public abstract class Part : MonoBehaviour {
     private int id;
     private bool state;
     private Vector2Int coords;
-    private bool isActive; // state cannot be changed externally
+    private bool isActive; // if true state cannot be changed externally
     private bool isSelected;
-    public readonly static Color ColorActive = new Color (0f, 0.7882353f, 0.0902f); // bright green
-    public readonly static Color ColorInactive = new Color (0.04705883f, 0.454902f, 0.1137255f); // dark green
-    public readonly static Color ColorSelected = new Color (0.4478532f, 0.8867924f, 0f); // another bright green
+    [SerializeField]
+    protected Color ActiveColor; // (0f, 0.7882353f, 0.0902f) bright green
+    [SerializeField]
+    protected Color InactiveColor; // (0.04705883f, 0.454902f, 0.1137255f) dark green
+    [SerializeField]
+    protected Color SelectedColor; // (0.4478532f, 0.8867924f, 0f) another bright green
 
-    public int Id { get; set; }
-
-    public bool State { 
-        get { return this.state; } 
-        set { this.state = value; OnStateUpdate (); } 
+    public int Id {
+        get { return this.id; }
+        set { this.id = value; }
     }
 
-    public Vector2Int GetCoords () {
-        return coords;
+    public bool State {
+        get { return this.state; }
+        set { this.state = value; OnStateUpdate (); }
     }
 
-    public void SetCoords (Vector2Int coords) {
-        this.coords = coords;
+    public Vector2Int Coords {
+        get { return this.coords; }
+        set { this.coords = value; }
     }
 
-    public bool IsActive () {
-        return isActive;
+    public bool Active {
+        get { return this.isActive; }
+        set { this.isActive = value; }
     }
 
-    public void SetIsActive (bool isActive) {
-        this.isActive = isActive;
-    }
-
-    public bool IsSelected () {
-        return isSelected;
-    }
-
-    public void SetSelected (bool isSelected) {
-        this.isSelected = isSelected;
-        OnSelectUpdate ();
-        GetSim ().ToggleSelected (this);
+    public bool Selected {
+        get { return this.isSelected; }
+        set {
+            this.isSelected = value;
+            OnSelectUpdate ();
+            GetSim ().ToggleSelected (this); // not sure about this line...
+        }
     }
 
     public abstract void OnStateUpdate ();
@@ -57,5 +56,4 @@ public abstract class Part : MonoBehaviour {
     public SimulationManager GetSim () {
         return SimulationManager.sim ();
     }
-
 }

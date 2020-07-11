@@ -137,7 +137,7 @@ public class SimulationManager : MonoBehaviour {
 
     public void ClearSelected () {
         while (selectedParts.Count != 0) {
-            selectedParts[0].SetSelected (false);
+            selectedParts[0].Selected = false;
         }
     }
 

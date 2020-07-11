@@ -15,8 +15,8 @@ public class Switch : Part {
         targetY = -offset;
         currY = targetY;
         toggle = transform.Find ("Toggle");
-        State = false;
-        SetIsActive (true);
+        this.State = false;
+        this.Active = true;
     }
 
     // Update is called once per frame

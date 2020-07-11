@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -120,7 +121,7 @@ public class Circuit {
     public void CalculateStateId (int id) {
         bool state = false;
         foreach (Part p in parts[id]) {
-            if (!p.IsActive () || state) break; // end of active parts or state = true -> can't be made false
+            if (!p.Active || state) break; // end of active parts or state = true -> can't be made false
             state |= p.State;
         }
         SetAllOfId (id, state);
@@ -154,7 +155,7 @@ public class Circuit {
     public void SetAllOfId (int id, bool state, bool hardSet = false) {
         List<Part> editParts = GetAllOfId (id);
         if (!hardSet) { // soft set filters out active parts
-            editParts = editParts.Where (p => !p.IsActive ()).ToList ();
+            editParts = editParts.Where (p => !p.Active).ToList ();
         }
         editParts.ForEach (p => p.State = state);
     }
@@ -162,7 +163,7 @@ public class Circuit {
     public void AddNode (GameObject nodeObj, Vector2Int coords) {
         GameObject tempObj = MonoBehaviour.Instantiate (nodeObj, ToVector3 (coords), Quaternion.identity);
         Part nodePart = tempObj.GetComponent<Part> ();
-        nodePart.SetCoords (coords);
+        nodePart.Coords = coords;
         nodePart.Id = nextId;
         AddPart (nodePart);
         nextId++;
@@ -170,6 +171,10 @@ public class Circuit {
     }
 
     public void AddWires (List<Wire> wires) {
+        // wires in list are not yet in 2d grid
+
+
+
         foreach (Wire w in wires) {
             w.Id = nextId;
             AddPart (w);
@@ -183,7 +188,7 @@ public class Circuit {
 
     private void AddPart (Part p) {
         if (p == null) return;
-        Vector2Int coords = p.GetCoords ();
+        Vector2Int coords = p.Coords;
         if (p is Wire) {
             Wire w = (Wire) p;
             partsGrid[coords.x, coords.y].SetWire (w, w.GetOrientation ());
@@ -220,7 +225,7 @@ public class Circuit {
         } else { // key (id) doesn't exist, initialize list
             parts.Add (partId, partsOfId);
         }
-        if (part.IsActive ()) {
+        if (part.Active) {
             partsOfId.Insert (0, part); // inserting active part at the front
         } else {
             partsOfId.Add (part); // adding passive part to the end
@@ -252,4 +257,24 @@ public class Circuit {
             return partsGrid[coord.x, coord.y].GetWire (direction);
         }
     }
+    /*
+    private Part GetNode(Vector2Int coord) {
+        if (Vector2.ang)
+        try {
+            return partsGrid[coord.x, coord.y].GetNode();
+        } catch (IndexOutOfRangeException e) {
+            return null;
+        }
+    }
+
+    // returns the id of the coorinate, if it exists
+    private int GetCoordId(Vector2Int coord) {
+        Part node = GetNode(coord);
+        if (node != null) return node.Id; // might only need this line
+        // In the future, a WireConnectionNode part might exist which would
+        // indicate that the horizontal and vertical wires are connected
+        // it would share the same id as those wires, and thus make it redundent
+        // to check the wires.
+
+    }*/
 }

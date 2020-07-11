@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wire : Part {
+public sealed class Wire : Part {
 
     private Vector2Int endPoint;
     private Vector2Int orientation; // either V2.up or V2.right
@@ -11,13 +11,13 @@ public class Wire : Part {
 
     void Awake () {
         sr = this.gameObject.GetComponent<SpriteRenderer> ();
-        State = false;
-        SetIsActive (false);
+        this.State = false;
+        this.Active = false;
         UpdateColor ();
     }
 
     void OnMouseDown () {
-        SetSelected (!IsSelected ());
+        this.Selected = !this.Selected;
         UpdateColor ();
     }
 
@@ -35,14 +35,14 @@ public class Wire : Part {
             end = tmp;
         }
 
-        SetCoords (start);
+        this.Coords = start;
         endPoint = end;
 
         orientation = end - start;
         Vector3 direction = (Vector2) orientation;
 
         this.transform.localScale = new Vector3 (len, len, 1) + direction * 9 * len;
-        this.transform.position = new Vector3 (GetCoords ().x, GetCoords ().y, -0.01f) + direction * 0.5f;
+        this.transform.position = new Vector3 (this.Coords.x, this.Coords.y, -0.01f) + direction * 0.5f;
     }
 
     public void Initialize (Vector2Int start, Vector2Int end) {
@@ -58,11 +58,11 @@ public class Wire : Part {
     }
 
     public void UpdateColor () {
-        if (IsSelected ()) {
-            sr.color = Part.ColorSelected;
+        if (Selected) {
+            sr.color = this.SelectedColor;
             sr.sortingOrder = 1;
         } else {
-            sr.color = State ? Part.ColorActive : Part.ColorInactive;
+            sr.color = this.State ? this.ActiveColor : this.InactiveColor;
         }
     }
 
@@ -75,6 +75,6 @@ public class Wire : Part {
     }
 
     public bool Equals (Wire w) {
-        return GetCoords ().Equals (w.GetCoords ()) && endPoint.Equals (w.endPoint);
+        return this.Coords.Equals (w.Coords) && endPoint.Equals (w.endPoint);
     }
 }
