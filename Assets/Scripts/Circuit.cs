@@ -25,16 +25,6 @@ public class Circuit
 		nextId = 0;
 	}
 
-	public int GetNextId()
-	{
-		return nextId;
-	}
-
-	public void IncrementNextId()
-	{
-		nextId++;
-	}
-
 	public void RebuildIds()
 	{ // full rebuild
 	  // assume that parts dictionary (which contains ids and lists of parts) is valid

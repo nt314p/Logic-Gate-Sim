@@ -20,12 +20,6 @@ public class GridController : MonoBehaviour
 		gridPlane.transform.position = new Vector3(width / 2f - 0.5f, height / 2f - 0.5f, 0);
 	}
 
-	// Update is called once per frame
-	void Update()
-	{
-
-	}
-
 	void OnMouseDown()
 	{
 		Debug.Log("Mouse down on plane!");

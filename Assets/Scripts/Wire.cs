@@ -4,35 +4,14 @@ using UnityEngine;
 
 public class Wire : Part
 {
-
-	private Vector2Int endPoint;
-	private Vector2Int orientation; // either V2.up or V2.right
-	private SpriteRenderer sr;
-	private readonly float len = 1.38f;
-
-	void Awake()
-	{
-		sr = this.gameObject.GetComponent<SpriteRenderer>();
+	private Vector2Int _endPoint;
+	private Vector2Int _orientation; // either V2.up or V2.right
+	
+	public Wire (Vector2Int start, Vector2Int end, int id = -1) : base(false)
+    {
 		this.State = false;
-		this.Active = false;
-		UpdateColor();
-	}
-
-	void OnMouseDown()
-	{
-		this.Selected = !this.Selected;
-		UpdateColor();
-	}
-
-	void OnMouseUp()
-	{
-		UpdateColor();
-		sr.sortingOrder = 0;
-	}
-
-	public void Initialize(Vector2Int start, Vector2Int end, int id)
-	{
-		Id = id;
+		this.Coords = start;
+		this.Id = id;
 
 		if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x))
 		{
@@ -41,56 +20,22 @@ public class Wire : Part
 			end = tmp;
 		}
 
-		this.Coords = start;
-		endPoint = end;
-
-		orientation = end - start;
-		Vector3 direction = (Vector2) orientation;
-
-		this.transform.localScale = new Vector3(len, len, 1) + direction * 9 * len;
-		this.transform.position = new Vector3(this.Coords.x, this.Coords.y, -0.01f) + direction * 0.5f;
-	}
-
-	public void Initialize(Vector2Int start, Vector2Int end)
-	{
-		Initialize(start, end, -1);
-	}
-
-	public override void OnStateUpdate()
-	{
-		UpdateColor();
-	}
-
-	public override void OnSelectUpdate()
-	{
-		UpdateColor();
-	}
-
-	public void UpdateColor()
-	{
-		if (Selected)
-		{
-			sr.color = this.SelectedColor;
-			sr.sortingOrder = 1;
-		}
-		else
-		{
-			sr.color = this.State ? this.ActiveColor : this.InactiveColor;
-		}
+		_endPoint = end;
+		_orientation = end - start;
 	}
 
 	public Vector2Int GetEndPoint()
 	{
-		return endPoint;
+		return _endPoint;
 	}
 
 	public Vector2Int GetOrientation()
 	{
-		return orientation;
+		return _orientation;
 	}
 
 	public bool Equals(Wire w)
 	{
-		return this.Coords.Equals(w.Coords) && endPoint.Equals(w.endPoint);
+		return this.Coords.Equals(w.Coords) && this._endPoint.Equals(w._endPoint);
 	}
 }
