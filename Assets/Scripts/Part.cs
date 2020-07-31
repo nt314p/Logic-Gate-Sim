@@ -5,10 +5,14 @@ using UnityEngine;
 
 public abstract class Part
 {
+    public static readonly Color ActiveColor = new Color(0f, 0.7882353f, 0.0902f); // bright green
+    public static readonly Color InactiveColor = new Color(0.04705883f, 0.454902f, 0.1137255f); // dark green
+    public static readonly Color SelectedColor = new Color(0.4478532f, 0.8867924f, 0f); // another bright green
+
     private int id;
     private bool state;
     private bool hasStateUpdate;
-    private bool isSelected;
+    private bool isSelected; // TO DO: This should be moved to the humble object because it is part of unity mechanics (selection not needed for circuit function)
     private bool hasSelectedUpdate;
     private Vector2Int coords;
     private bool isActive; // if true state cannot be changed externally
@@ -73,7 +77,7 @@ public abstract class Part
 
     public override string ToString()
     {
-        return "Type: " + this.GetType() + "; Part Id: " + id;
+        return $"Type: {this.GetType()}; Id: {this.Id}";
     }
 
     public SimulationManager GetSim()

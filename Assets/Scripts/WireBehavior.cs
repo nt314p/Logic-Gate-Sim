@@ -18,8 +18,12 @@ public class WireBehavior : MonoBehaviour
 		this.transform.localScale = new Vector3(WIRE_LEN, WIRE_LEN, 1) + direction * 9 * WIRE_LEN;
 		this.transform.position = new Vector3(_wire.Coords.x, _wire.Coords.y, -0.01f) + direction * 0.5f;
 	}
+	private void Update()
+	{
+		if (_wire.HasStateUpdate() || _wire.HasStateUpdate()) UpdateColor();
+	}
 
-	void OnMouseDown()
+    void OnMouseDown()
 	{
 		_wire.Selected = !_wire.Selected;
 		UpdateColor();
@@ -29,16 +33,6 @@ public class WireBehavior : MonoBehaviour
 	{
 		UpdateColor();
 		_sr.sortingOrder = 0;
-	}
-
-	public override void OnStateUpdate()
-	{
-		UpdateColor();
-	}
-
-	public override void OnSelectUpdate()
-	{
-		UpdateColor();
 	}
 
 	public void UpdateColor()
