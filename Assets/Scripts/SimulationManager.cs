@@ -15,7 +15,7 @@ public class SimulationManager : MonoBehaviour
     public bool drawingWirePath;
     private string selectedPart;
     private Circuit currentCircuit;
-    private List<Part> selectedParts;
+    private List<PartBehavior> selectedParts;
 
     public Dictionary<KeyCode, string> keybinds = new Dictionary<KeyCode, string>
     { { KeyCode.W, "wire" },
@@ -38,7 +38,7 @@ public class SimulationManager : MonoBehaviour
         wiresInPath = new List<GameObject> ();
         drawingWirePath = false;
         selectedPart = "";
-        selectedParts = new List<Part> ();
+        selectedParts = new List<PartBehavior> ();
 
         currentCircuit = new Circuit (GridController.width, GridController.height);
         currentCircuit.RecalculateIds ();
@@ -148,7 +148,7 @@ public class SimulationManager : MonoBehaviour
         return currentCircuit;
     }
 
-    public bool ToggleSelected (Part p)
+    public bool ToggleSelected (PartBehavior p)
     {
         if (selectedParts.Contains (p))
         {
