@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class SimulationManager : MonoBehaviour
 {
@@ -116,7 +117,7 @@ public class SimulationManager : MonoBehaviour
                             Vector2Int start = wirePath[wirePath.Count - 2];
                             Vector2Int end = wirePath[wirePath.Count - 1];
                             wiresInPath.Add (Instantiate (wire, ToVector3 (start), Quaternion.identity));
-                            wiresInPath[wiresInPath.Count - 1].GetComponent<Wire> ().Initialize (start, end);
+                            wiresInPath[wiresInPath.Count - 1].GetComponent<WireBehavior> ().Initialize (start, end);
                         }
                     }
                 }
@@ -125,13 +126,13 @@ public class SimulationManager : MonoBehaviour
 
         if (Input.GetMouseButtonUp (0))
         {
-            List<Wire> wireList = new List<Wire> ();
+            List<WireBehavior> wireList = new List<WireBehavior> ();
             for (int i = 0; i < wiresInPath.Count; i++)
             {
-                wireList.Add (wiresInPath[i].GetComponent<Wire> ());
+                wireList.Add (wiresInPath[i].GetComponent<WireBehavior> ());
             }
             if (wireList.Count > 0)
-                currentCircuit.AddWires (wireList);
+                currentCircuit.AddWires (wireList.Select(w => w.getPartOb);
             wiresInPath = new List<GameObject> (); // resetting variables
             wirePath = new List<Vector2Int> ();
             drawingWirePath = false;

@@ -37,8 +37,8 @@ public class SwitchBehavior : PartBehavior
         
     }
 
-    public override void OnStateUpdate()
+    public override void OnStateChanged()
     {
-        targetY = offset * (PartObj.State ? 1 : -1);
+        targetY = offset * (PartObject.State ? 1 : -1);
     }
 }

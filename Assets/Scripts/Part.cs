@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditorInternal;
 using UnityEngine;
@@ -7,7 +8,7 @@ public abstract class Part
 {
     private int id;
     private bool state;
-    private bool hasStateUpdate;
+    public event Action<Part> StateChanged;
     private Vector2Int coords;
     private bool isActive; // if true state cannot be changed externally
 
@@ -29,7 +30,7 @@ public abstract class Part
         get => this.state;
         set
         {
-            if (this.state != value) hasStateUpdate = true;
+            if (this.state != value) StateChanged?.Invoke(this);
             this.state = value;
         }
     }

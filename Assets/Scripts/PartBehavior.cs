@@ -1,8 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public abstract class PartBehavior : MonoBehaviour
+public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
 {
     /*[SerializeField]
     protected Color ActiveColor; // (0f, 0.7882353f, 0.0902f) bright green
@@ -18,25 +20,27 @@ public abstract class PartBehavior : MonoBehaviour
     protected readonly Color SelectedColor = new Color(0.4478532f, 0.8867924f, 0f); // another bright green
 
     private bool isSelected;
-    private bool hasSelectedUpdate;
+    public event Action<PartBehavior> SelectChanged;
     private bool sr;
+    private Part partObject;
 
-    public Part PartObj
-    {
-        get; set;
+    public Part PartObject {
+        get => this.partObject;
+        set 
+        {
+            this.partObject = value;
+            PartObject.StateChanged += OnStateChanged;
+        }
     }
 
-    public SpriteRenderer SRenderer
-    {
-        get; set;
-    }
+    public SpriteRenderer SRenderer { get; set; }
 
     public bool Selected
     {
         get => this.isSelected;
         set
         {
-            if (this.isSelected != value) hasSelectedUpdate = true;
+            if (this.isSelected != value) SelectChanged?.Invoke(this);
             this.isSelected = value;
             GetSim().ToggleSelected(this); // not sure about this line...
         }
@@ -44,7 +48,7 @@ public abstract class PartBehavior : MonoBehaviour
 
     private void Update()
     {
-        if (PartObj.HasStateUpdate()) OnStateUpdate();
+        if (PartObject.HasStateUpdate()) OnStateChanged();
         if (hasSelectedUpdate)
         {
             hasSelectedUpdate = false;
@@ -58,7 +62,7 @@ public abstract class PartBehavior : MonoBehaviour
 
     }
 
-    public virtual void OnStateUpdate()
+    public virtual void OnStateChanged(Part part)
     {
         UpdateColor();
     }
@@ -69,25 +73,31 @@ public abstract class PartBehavior : MonoBehaviour
 
     void OnMouseDown()
     {
-        Debug.Log("Clicked " + this.ToString());
-        if (Input.GetKey(KeyCode.LeftControl) && PartObj.Active)
-        {
-            PartObj.State = !PartObj.State;
-            GetSim().GetCircuit().CalculateStateId(PartObj.Id);
-        } else
-        {
-            this.Selected = !this.Selected; // toggle selected
-        }
+        
     }
 
     public virtual void UpdateColor()
     {
-        SRenderer.color = PartObj.State ? this.ActiveColor : this.InactiveColor;
+        SRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
         if (this.Selected) SRenderer.color = this.SelectedColor;
     }
 
     public SimulationManager GetSim()
     {
         return SimulationManager.sim();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Debug.Log("Clicked " + this.ToString());
+        if (Input.GetKey(KeyCode.LeftControl) && PartObject.Active)
+        {
+            PartObject.State = !PartObject.State;
+            GetSim().GetCircuit().CalculateStateId(PartObject.Id);
+        }
+        else
+        {
+            this.Selected = !this.Selected; // toggle selected
+        }
     }
 }
