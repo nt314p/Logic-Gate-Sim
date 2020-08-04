@@ -4,35 +4,35 @@ using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
-	public static int width = 30;
-	public static int height = 30;
-	private Material gridMat;
-	private GameObject gridPlane;
+	public static int Width = 30;
+	public static int Height = 30;
+	private Material _gridMaterial;
+	private GameObject _gridPlane;
 
-	void Start()
+	private void Start()
 	{
-		gridPlane = this.gameObject;
-		gridMat = gridPlane.GetComponent<Renderer>().material;
+		_gridPlane = this.gameObject;
+		_gridMaterial = _gridPlane.GetComponent<Renderer>().material;
 
-		gridMat.mainTextureScale = new Vector2(width, height);
-		gridPlane.transform.localScale = new Vector3(width, height, 1);
-		// gridPlane.transform.position = new Vector3 (width * 0.5f - 0.5f, height * 0.5f - 0.5f, 0);
-		gridPlane.transform.position = new Vector3(width / 2f - 0.5f, height / 2f - 0.5f, 0);
+		_gridMaterial.mainTextureScale = new Vector2(Width, Height);
+		_gridPlane.transform.localScale = new Vector3(Width, Height, 1);
+		// gridPlane.transform.position = new Vector3 (Width * 0.5f - 0.5f, Height * 0.5f - 0.5f, 0);
+		_gridPlane.transform.position = new Vector3(Width / 2f - 0.5f, Height / 2f - 0.5f, 0);
 	}
 
-	void OnMouseDown()
+	private void OnMouseDown()
 	{
 		Debug.Log("Mouse down on plane!");
-		SimulationManager.sim().ClearSelected();
+		SimulationManager.Sim().ClearSelected();
 	}
 
 	public void SetWidth(int width)
 	{
-		GridController.width = width;
+		GridController.Width = width;
 	}
 
 	public void SetHeight(int height)
 	{
-		GridController.height = height;
+		GridController.Height = height;
 	}
 }

@@ -18,7 +18,7 @@ public class SwitchBehavior : PartBehavior
         toggle = transform.Find("Toggle");
     }
 
-    public override void ChildUpdate()
+    private void Update()
     {
         toggle.localPosition = Vector3.up * currY; // new Vector3(0, currY, 0); 
 
@@ -37,8 +37,8 @@ public class SwitchBehavior : PartBehavior
         
     }
 
-    public override void OnStateChanged()
+    public override void OnStateChanged(Part part)
     {
-        targetY = offset * (PartObject.State ? 1 : -1);
+        targetY = offset * (part.State ? 1 : -1);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class WireBehavior : PartBehavior
 {
 
-    private readonly float WIRE_LEN = 1.38f;
+    private static readonly float WIRE_LEN = 1.38f;
 
     private void Awake()
     {
@@ -16,7 +16,7 @@ public class WireBehavior : PartBehavior
 		this.transform.position = new Vector3(PartObject.Coords.x, PartObject.Coords.y, -0.01f) + direction * 0.5f;
 	}
 
-	void OnMouseUp()
+	private void OnMouseUp()
 	{
 		UpdateColor();
 		SRenderer.sortingOrder = 0;

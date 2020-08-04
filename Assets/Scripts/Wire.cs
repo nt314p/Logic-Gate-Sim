@@ -5,7 +5,7 @@ using UnityEngine;
 public class Wire : Part
 {
 	private Vector2Int _endPoint;
-	private Vector2Int _orientation; // either V2.up or V2.right
+	private readonly Vector2Int _orientation; // either V2.up or V2.right
 	
 	public Wire (Vector2Int start, Vector2Int end, int id = -1) : base(false)
     {
@@ -15,7 +15,7 @@ public class Wire : Part
 
 		if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x))
 		{
-			Vector2Int tmp = start; // swapping if start is not the min value
+			var tmp = start; // swapping if start is not the min value
 			start = end;
 			end = tmp;
 		}

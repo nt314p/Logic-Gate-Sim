@@ -1,58 +1,33 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditorInternal;
 using UnityEngine;
 
 public abstract class Part
 {
-    private int id;
-    private bool state;
+    private bool _state;
     public event Action<Part> StateChanged;
-    private Vector2Int coords;
-    private bool isActive; // if true state cannot be changed externally
 
     public Part(bool isActive, int id = -1)
     {
-        this.isActive = isActive;
+        this.Active = isActive;
         this.State = false;
         this.Id = id;
     }
 
-    public int Id
-    {
-        get => this.id;
-        set => this.id = value;
-    }
+    public int Id { get; set; }
 
     public bool State
     {
-        get => this.state;
+        get => this._state;
         set
         {
-            if (this.state != value) StateChanged?.Invoke(this);
-            this.state = value;
+            if (this._state != value) StateChanged?.Invoke(this);
+            this._state = value;
         }
     }
 
-    public Vector2Int Coords
-    {
-        get => this.coords;
-        set => this.coords = value;
-    }
+    public Vector2Int Coords { get; set; }
 
-    public bool Active
-    {
-        get => this.isActive;
-        //set => this.isActive = value;
-    }
-
-    public bool HasStateUpdate()
-    {
-        bool temp = hasStateUpdate;
-        hasStateUpdate = false; // reset state state once it has been accessed by its respective humble object
-        return temp;
-    }
+    public bool Active { get; }
 
     public override string ToString()
     {

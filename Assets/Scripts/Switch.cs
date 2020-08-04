@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class Switch : Part
 {
-
 	public Switch (): base(true)
     {
-
     }	
 }

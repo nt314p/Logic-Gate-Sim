@@ -19,16 +19,17 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
     protected readonly Color InactiveColor = new Color(0.04705883f, 0.454902f, 0.1137255f); // dark green
     protected readonly Color SelectedColor = new Color(0.4478532f, 0.8867924f, 0f); // another bright green
 
-    private bool isSelected;
+    private bool _isSelected;
     public event Action<PartBehavior> SelectChanged;
-    private bool sr;
-    private Part partObject;
+    private Part _partObject;
 
-    public Part PartObject {
-        get => this.partObject;
-        set 
+    public Part PartObject
+    {
+        get => this._partObject;
+        set
         {
-            this.partObject = value;
+            if (PartObject != null) PartObject.StateChanged -= OnStateChanged;
+            this._partObject = value;
             PartObject.StateChanged += OnStateChanged;
         }
     }
@@ -37,59 +38,48 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
 
     public bool Selected
     {
-        get => this.isSelected;
+        get => this._isSelected;
         set
         {
-            if (this.isSelected != value) SelectChanged?.Invoke(this);
-            this.isSelected = value;
+            if (this._isSelected != value) SelectChanged?.Invoke(this);
+            this._isSelected = value;
             GetSim().ToggleSelected(this); // not sure about this line...
         }
     }
 
-    private void Update()
+    private void Awake()
     {
-        if (PartObject.HasStateUpdate()) OnStateChanged();
-        if (hasSelectedUpdate)
-        {
-            hasSelectedUpdate = false;
-            OnSelectUpdate();
-        }
-        ChildUpdate();
-    }
-
-    public virtual void ChildUpdate()
-    {
-
+        SelectChanged += OnSelectChanged;
     }
 
     public virtual void OnStateChanged(Part part)
     {
         UpdateColor();
     }
-    public virtual void OnSelectUpdate()
+    public virtual void OnSelectChanged(PartBehavior partBehavior)
     {
         UpdateColor();
     }
 
     void OnMouseDown()
     {
-        
+
     }
 
     public virtual void UpdateColor()
     {
         SRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
-        if (this.Selected) SRenderer.color = this.SelectedColor;
+        if (this._isSelected) SRenderer.color = this.SelectedColor;
     }
 
     public SimulationManager GetSim()
     {
-        return SimulationManager.sim();
+        return SimulationManager.Sim();
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        Debug.Log("Clicked " + this.ToString());
+        Debug.Log("Clicked " + this);
         if (Input.GetKey(KeyCode.LeftControl) && PartObject.Active)
         {
             PartObject.State = !PartObject.State;

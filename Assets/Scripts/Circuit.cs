@@ -7,28 +7,28 @@ using UnityEngine;
 public class Circuit
 {
 
-	private PartWrapper[,] partsGrid;
-	private IDictionary<int, List<Part>> parts;
-	private int nextId;
+	private readonly PartWrapper[,] _partsGrid;
+	private IDictionary<int, List<Part>> _parts;
+	private int _nextId;
 
 	public Circuit(int gridX, int gridY)
 	{
-		parts = new Dictionary<int, List<Part>>();
-		partsGrid = new PartWrapper[gridX, gridY];
-		for (int i = 0; i < partsGrid.GetLength(0); i++)
+		_parts = new Dictionary<int, List<Part>>();
+		_partsGrid = new PartWrapper[gridX, gridY];
+		for (var i = 0; i < _partsGrid.GetLength(0); i++)
 		{
-			for (int j = 0; j < partsGrid.GetLength(1); j++)
+			for (var j = 0; j < _partsGrid.GetLength(1); j++)
 			{
-				partsGrid[i, j] = new PartWrapper();
+				_partsGrid[i, j] = new PartWrapper();
 			}
 		}
-		nextId = 0;
+		_nextId = 0;
 	}
 
 	public void RebuildIds()
 	{ // full rebuild
 	  // assume that parts dictionary (which contains ids and lists of parts) is valid
-		List<Part> allParts = parts.SelectMany(x => x.Value).ToList();
+		var allParts = _parts.SelectMany(x => x.Value).ToList();
 		allParts.ForEach(p => p.Id = -1); // clearing ids
 
 		// foreach ()
@@ -37,41 +37,41 @@ public class Circuit
 	public void RecalculateIds()
 	{
 		Debug.Log("Recalculating!");
-		parts = new Dictionary<int, List<Part>>();
-		nextId = 0;
-		for (int i = 0; i < partsGrid.GetLength(0); i++)
+		_parts = new Dictionary<int, List<Part>>();
+		_nextId = 0;
+		for (var i = 0; i < _partsGrid.GetLength(0); i++)
 		{ // clearing ids
-			for (int j = 0; j < partsGrid.GetLength(1); j++)
+			for (var j = 0; j < _partsGrid.GetLength(1); j++)
 			{
-				for (int k = 0; k < 2; k++)
+				for (var k = 0; k < 2; k++)
 				{
-					if (partsGrid[i, j].GetParts()[k] != null)
+					if (_partsGrid[i, j].GetParts()[k] != null)
 					{
-						partsGrid[i, j].GetParts()[k].Id = -1;
+						_partsGrid[i, j].GetParts()[k].Id = -1;
 					}
 				}
 			}
 		}
 
-		for (int i = 0; i < partsGrid.GetLength(0); i++)
+		for (var i = 0; i < _partsGrid.GetLength(0); i++)
 		{
-			for (int j = 0; j < partsGrid.GetLength(1); j++)
+			for (var j = 0; j < _partsGrid.GetLength(1); j++)
 			{ // iterating through 2d grid
-				Wire left = GetWire(new Vector2Int(i, j), Vector2Int.left);
-				Wire bottom = GetWire(new Vector2Int(i, j), Vector2Int.down);
+				var left = GetWire(new Vector2Int(i, j), Vector2Int.left);
+				var bottom = GetWire(new Vector2Int(i, j), Vector2Int.down);
 
-				int nodeId = -2; // the id at the node (i, j)
+				int nodeId; // the id at the node (i, j)
 				if (left == null && bottom == null)
 				{
-					nodeId = nextId;
+					nodeId = _nextId;
 				}
 				else if (left != null && bottom != null)
 				{
 					nodeId = left.Id;
-					List<Part> bottomPathParts = GetAllOfId(bottom.Id); // getting bottom path
-					for (int k = 0; k < bottomPathParts.Count; k++)
+					var bottomPathParts = GetAllOfId(bottom.Id); // getting bottom path
+					for (var k = 0; k < bottomPathParts.Count; k++)
 					{ // iterating through bottom path parts
-						Part p = bottomPathParts[k];
+						var p = bottomPathParts[k];
 
 						// setting bottom path ids to left path ids
 						if (UpdatePartIdInDict(p, nodeId))
@@ -90,9 +90,9 @@ public class Circuit
 					nodeId = left.Id;
 				}
 
-				Part[] nodeParts = partsGrid[i, j].GetParts();
+				var nodeParts = _partsGrid[i, j].GetParts();
 
-				foreach (Part p in nodeParts)
+				foreach (var p in nodeParts)
 				{
 					if (p != null)
 					{
@@ -100,41 +100,41 @@ public class Circuit
 					}
 				}
 
-				Wire top = partsGrid[i, j].GetWire(Vector2Int.up);
-				Wire right = partsGrid[i, j].GetWire(Vector2Int.right);
+				var top = _partsGrid[i, j].GetWire(Vector2Int.up);
+				var right = _partsGrid[i, j].GetWire(Vector2Int.right);
 
 				if (top != null || right != null)
 				{
-					nextId++;
+					_nextId++;
 				}
 			}
 		}
 
 		TrimIds();
 
-		int[] ids = new int[parts.Keys.Count];
-		parts.Keys.CopyTo(ids, 0);
-		foreach (int currId in ids)
+		var ids = new int[_parts.Keys.Count];
+		_parts.Keys.CopyTo(ids, 0);
+		foreach (var currentId in ids)
 		{ // recalculating states for all ids
-			CalculateStateId(currId);
+			CalculateStateId(currentId);
 		}
 	}
 
 	public void TrimIds()
 	{
-		nextId = 0;
-		int[] ids = new int[parts.Keys.Count];
-		parts.Keys.CopyTo(ids, 0);
-		Debug.Log("trimmin'");
-		foreach (int currId in ids)
+		_nextId = 0;
+		int[] ids = new int[_parts.Keys.Count];
+		_parts.Keys.CopyTo(ids, 0);
+		Debug.Log("Trimming");
+		foreach (var currentId in ids)
 		{
-			if (parts[currId].Count == 0)
+			if (_parts[currentId].Count == 0)
 			{
-				parts.Remove(currId);
+				_parts.Remove(currentId);
 			}
 			else
 			{
-				ReplaceId(currId, nextId++);
+				ReplaceId(currentId, _nextId++);
 			}
 		}
 	}
@@ -142,8 +142,8 @@ public class Circuit
 	// calculates the state of an id based on the states of its active components
 	public void CalculateStateId(int id)
 	{
-		bool state = false;
-		foreach (Part p in parts[id])
+		var state = false;
+		foreach (var p in _parts[id])
 		{
 			if (!p.Active || state) break; // end of active parts or state = true -> can't be made false
 			state |= p.State;
@@ -154,9 +154,9 @@ public class Circuit
 	public void ReplaceId(int oldId, int newId)
 	{
 		if (oldId == newId) return;
-		parts[newId] = parts[oldId]; // set list reference in dict to new id
-		parts.Remove(oldId);
-		parts[newId].ForEach(p => p.Id = newId);
+		_parts[newId] = _parts[oldId]; // set list reference in dict to new id
+		_parts.Remove(oldId);
+		_parts[newId].ForEach(p => p.Id = newId);
 	}
 
 	// links all part ids passed in
@@ -177,7 +177,7 @@ public class Circuit
 
 	public List<Part> GetAllOfId(int id)
 	{
-		return parts[id];
+		return _parts[id];
 	}
 
 	// hard set all, sets ALL components, soft set will ignore active components
@@ -196,9 +196,9 @@ public class Circuit
 		GameObject tempObj = MonoBehaviour.Instantiate(nodeObj, ToVector3(coords), Quaternion.identity);
 		Part nodePart = tempObj.GetComponent<Part>();
 		nodePart.Coords = coords;
-		nodePart.Id = nextId;
+		nodePart.Id = _nextId;
 		AddPart(nodePart);
-		nextId++;
+		_nextId++;
 		RecalculateIds();
 	}
 
@@ -210,13 +210,13 @@ public class Circuit
 
 		foreach (Wire w in wires)
 		{
-			w.Id = nextId;
+			w.Id = _nextId;
 			AddPart(w);
 		}
 
 		if (wires.Count > 0)
 		{
-			nextId++;
+			_nextId++;
 			RecalculateIds();
 		}
 	}
@@ -225,18 +225,17 @@ public class Circuit
 	{
 		if (p == null) return;
 		Vector2Int coords = p.Coords;
-		if (p is Wire)
-		{
-			Wire w = (Wire)p;
-			partsGrid[coords.x, coords.y].SetWire(w, w.GetOrientation());
-		}
-		else
-		{
-			partsGrid[coords.x, coords.y].SetNode(p);
-			Debug.Log("Added " + p.GetType().ToString());
-		}
+        if (p is Wire w)
+        {
+            _partsGrid[coords.x, coords.y].SetWire(w, w.GetOrientation());
+        }
+        else
+        {
+            _partsGrid[coords.x, coords.y].SetNode(p);
+            Debug.Log("Added " + p.GetType().ToString());
+        }
 
-		/*
+        /*
         if (p is LED) {
             LED led = (LED) p;
             partsGrid[coords.x, coords.y].SetNode (led);
@@ -250,7 +249,7 @@ public class Circuit
             partsGrid[coords.x, coords.y].SetNode (b);
             Debug.Log ("ADDED A BUTTON!");
         }*/
-		AddPartToDict(p);
+        AddPartToDict(p);
 	}
 
 	private void AddPartToDict(Part part)
@@ -261,13 +260,13 @@ public class Circuit
 			Debug.Log("POTATS! partId is: " + partId);
 		}
 		List<Part> partsOfId = new List<Part>();
-		if (parts.ContainsKey(partId))
+		if (_parts.ContainsKey(partId))
 		{ // key (id) exists
-			partsOfId = parts[partId];
+			partsOfId = _parts[partId];
 		}
 		else
 		{ // key (id) doesn't exist, initialize list
-			parts.Add(partId, partsOfId);
+			_parts.Add(partId, partsOfId);
 		}
 		if (part.Active)
 		{
@@ -281,10 +280,10 @@ public class Circuit
 
 	private bool UpdatePartIdInDict(Part part, int newId)
 	{
-		bool idExists = parts.ContainsKey(part.Id);
+		bool idExists = _parts.ContainsKey(part.Id);
 		if (idExists)
 		{
-			List<Part> partsOfId = parts[part.Id];
+			List<Part> partsOfId = _parts[part.Id];
 			partsOfId.Remove(part);
 		}
 		part.Id = newId;
@@ -304,11 +303,11 @@ public class Circuit
 		if (direction.x == -1 || direction.y == -1)
 		{ // left or bottom
 			Vector2Int shifted = coord + direction;
-			return partsGrid[shifted.x, shifted.y].GetWire(-direction);
+			return _partsGrid[shifted.x, shifted.y].GetWire(-direction);
 		}
 		else
 		{ // top or right
-			return partsGrid[coord.x, coord.y].GetWire(direction);
+			return _partsGrid[coord.x, coord.y].GetWire(direction);
 		}
 	}
 	/*
