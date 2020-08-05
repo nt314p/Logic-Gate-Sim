@@ -6,9 +6,8 @@ using UnityEngine;
 
 public class Circuit
 {
-
-	private readonly PartWrapper[,] _partsGrid;
-	private IDictionary<int, List<Part>> _parts;
+    private readonly PartWrapper[,] _partsGrid;
+    private IDictionary<int, List<Part>> _parts;
 	private int _nextId;
 
 	public Circuit(int gridX, int gridY)
@@ -296,7 +295,7 @@ public class Circuit
 		return (Vector3)(Vector2)vecInt;
 	}
 
-	// gets a wire based on direction from the part grid
+	// gets a Wire based on direction from the part grid
 	private Wire GetWire(Vector2Int coord, Vector2Int direction)
 	{
 		if (coord.x == 0 || coord.y == 0) return null;

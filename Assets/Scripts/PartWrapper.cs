@@ -4,69 +4,69 @@ using UnityEngine;
 public class PartWrapper
 {
 
-	private Dictionary<Vector2Int, Wire> wires;
-	private Part node;
-	private bool isConnected; // whether or not the horizontal and vertical wires are connected
+	private readonly Dictionary<Vector2Int, Wire> _wires;
+	private Part _node;
+	private bool _isConnected; // whether or not the horizontal and vertical wires are connected
 
 	public PartWrapper(Wire top, Wire right, Part node)
 	{
-		wires = new Dictionary<Vector2Int, Wire>();
-		wires.Add(Vector2Int.up, top);
-		wires.Add(Vector2Int.right, right);
-		this.node = node;
-		this.isConnected = false;
+        _wires = new Dictionary<Vector2Int, Wire>
+        {
+            { Vector2Int.up, top },
+            { Vector2Int.right, right }
+        };
+        this._node = node;
+		this._isConnected = false;
 	}
 
 	public PartWrapper()
 	{
-		wires = new Dictionary<Vector2Int, Wire>();
-		wires.Add(Vector2Int.up, null);
-		wires.Add(Vector2Int.right, null);
-		this.node = null;
-		this.isConnected = false;
+        _wires = new Dictionary<Vector2Int, Wire> {{Vector2Int.up, null}, {Vector2Int.right, null}};
+        this._node = null;
+		this._isConnected = false;
 	}
 
 	public Wire GetWire(Vector2Int direction)
 	{
-		return wires[direction];
+		return _wires[direction];
 	}
 
 	public Part GetNode()
 	{
-		return node;
+		return _node;
 	}
 
 	public Wire[] GetWires()
 	{
-		return new Wire[] { wires[Vector2Int.up], wires[Vector2Int.right] };
+		return new Wire[] { _wires[Vector2Int.up], _wires[Vector2Int.right] };
 	}
 
 	public Part[] GetParts()
 	{
-		return new Part[] { wires[Vector2Int.up], wires[Vector2Int.right], node };
+		return new Part[] { _wires[Vector2Int.up], _wires[Vector2Int.right], _node };
 	}
 
 	public bool IsConnected()
 	{ // should this be implicitly equal to node != null??
-		return isConnected;
+		return _isConnected;
 	}
 
 	public void SetWire(Wire wire, Vector2Int direction)
 	{
 		if (direction.x + direction.y == 1)
 		{ // loose check for (0, 1) and (1, 0)
-			wires[direction] = wire;
+			_wires[direction] = wire;
 		}
 	}
 
 	public void SetNode(Part node)
 	{
-		this.node = node;
+		this._node = node;
 	}
 
 	public void SetConnected(bool connected)
 	{
-		this.isConnected = connected;
+		this._isConnected = connected;
 	}
 
 }
