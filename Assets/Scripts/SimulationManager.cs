@@ -5,7 +5,6 @@ using System.Linq;
 
 public class SimulationManager : MonoBehaviour
 {
-
     private static SimulationManager _instance = null;
     public static GameObject Wire;
     public static GameObject Led;
@@ -115,7 +114,7 @@ public class SimulationManager : MonoBehaviour
                             Vector2Int start = _wirePath[_wirePath.Count - 2];
                             Vector2Int end = _wirePath[_wirePath.Count - 1];
                             _wiresInPath.Add(Instantiate(Wire, ToVector3(start), Quaternion.identity));
-                            _wiresInPath[_wiresInPath.Count - 1].GetComponent<WireBehavior>().Initialize(start, end);
+                            _wiresInPath[_wiresInPath.Count - 1].GetComponent<WireBehavior>();//.Initialize(start, end);
                         }
                     }
                 }
@@ -174,18 +173,17 @@ public class SimulationManager : MonoBehaviour
     }
 
     // returns the angle of the vector formed by the vector2s passed in
-    private float AngleOf(Vector2Int start, Vector2Int end)
+    private static float AngleOf(Vector2Int start, Vector2Int end)
     {
-        float angle = Mathf.Atan2((start.y - end.y), (start.x - end.x)) * Mathf.Rad2Deg;
+        var angle = Mathf.Atan2((start.y - end.y), (start.x - end.x)) * Mathf.Rad2Deg;
         if (angle < 0) angle += 180; // we want a positive angle
         return angle % 180;
     }
 
     // Interpolate method determines the horizontal and vertical steps to model a diagonal line
-    private List<Vector2Int> Interpolate(Vector2Int start, Vector2Int end)
+    private static List<Vector2Int> Interpolate(Vector2Int start, Vector2Int end)
     {
-        var ret = new List<Vector2Int>(); // list of the coordinates of the steps
-        ret.Add(start);
+        var ret = new List<Vector2Int> {start}; // list of the coordinates of the steps
 
         var targetAngle = AngleOf(start, end); // determining angle of the diagonal line to approximate
 
@@ -204,14 +202,8 @@ public class SimulationManager : MonoBehaviour
             // the angle formed when the last coordinate is incremented by a horizontal step
             var hAngle = AngleOf(start, hStep);
 
-            if (Mathf.Abs(vAngle - targetAngle) < Mathf.Abs(hAngle - targetAngle))
-            {
-                ret.Add(vStep); // vertical step brings us closer to the target angle
-            }
-            else
-            {
-                ret.Add(hStep); // horizontal step brings us closer to the target angle
-            }
+            // add the step that will bring us closer to the target angle
+            ret.Add(Mathf.Abs(vAngle - targetAngle) < Mathf.Abs(hAngle - targetAngle) ? vStep : hStep);
         }
         ret.RemoveAt(0); // removing starting coordinate
         return ret;
@@ -220,7 +212,7 @@ public class SimulationManager : MonoBehaviour
     private bool IsWithinBounds(Vector2Int vec)
     {
         var clamped = new Vector2Int(vec.x, vec.y);
-        clamped.Clamp(Vector2Int.zero, new Vector2Int(49, 49));
+        clamped.Clamp(Vector2Int.zero, new Vector2Int(49, 49)); // fix hardcode
         return clamped.Equals(vec);
     }
 

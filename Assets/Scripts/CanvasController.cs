@@ -5,22 +5,14 @@ using UnityEngine.UI;
 
 public class CanvasController : MonoBehaviour
 {
-	// Start is called before the first frame update
-
-	private Text coordText;
-	private GameObject cam;
-
-	void Start()
-	{
-		cam = Camera.main.gameObject;
-		coordText = transform.Find("CoordinateText").gameObject.GetComponent<Text>();
-	}
-
+	[SerializeField] private Text _coordinatesText;
+	[SerializeField] private GameObject _cameraGameObject;
+	
 	// Update is called once per frame
 	void Update()
 	{
-		Vector3 temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		Vector2Int coord = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-		coordText.text = coord.ToString();
+		var temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+		var coordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+		_coordinatesText.text = coordinates.ToString();
 	}
 }

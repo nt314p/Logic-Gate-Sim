@@ -1,68 +1,64 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
 
-	private float zoom;
-	private readonly float zoomScale = 0.5f;
-	private readonly float initZoom = 10;
-	private readonly float minZoom = 1.2f;
-	private readonly float maxZoom = 15;
-	private Vector3 targetPos;
-	private Vector3 dragOrigin, oldPos;
+    private const float ZoomScale = 0.5f;
+    private const float InitialZoom = 10;
+    private const float MinZoom = 1.2f;
+    private const float MaxZoom = 15;
+    private const float DragSpeed = 2;
+    private float _zoom;
+    private Vector3 _dragOrigin, _oldPosition;
+    [SerializeField] private Camera _mainCamera;
 
-	void Start()
-	{
-		Camera.main.orthographicSize = initZoom;
-		zoom = initZoom;
-		targetPos = Camera.main.transform.position;
-	}
+    private void Start()
+    {
+        _mainCamera.orthographicSize = InitialZoom;
+        _zoom = InitialZoom;
+    }
 
-	// Update is called once per frame
-	void Update()
-	{
-		if (Input.GetMouseButtonDown(1))
-		{
-			dragOrigin = Input.mousePosition;
-			oldPos = transform.position;
-		}
+    // Update is called once per frame
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            _dragOrigin = Input.mousePosition;
+            _oldPosition = transform.position;
+        }
 
-		if (Input.GetMouseButton(1))
-		{
-			//Camera.main.ScreenToViewportPoint (Input.mousePosition - dragOrigin);
-			Vector3 pos = Camera.main.ScreenToViewportPoint(Input.mousePosition - dragOrigin);
-			Vector3 move = oldPos + -pos * zoom;
-			targetPos += move - transform.position;
-			transform.position = move;
+        if (Input.GetMouseButton(1))
+        {
+            var position = _mainCamera.ScreenToViewportPoint(Input.mousePosition - _dragOrigin);
+            transform.position = _oldPosition - position * _zoom * DragSpeed;
+        }
 
-		}
+        var scrollInput = Input.GetAxis("Mouse ScrollWheel");
+        
+        if (scrollInput < 0 && _zoom < MaxZoom)
+        {
+            ZoomCamera(_mainCamera.ScreenToWorldPoint(Input.mousePosition), -ZoomScale);
+        }
+        if (scrollInput > 0 && _zoom > MinZoom)
+        {
+            ZoomCamera(_mainCamera.ScreenToWorldPoint(Input.mousePosition), ZoomScale);
+        }
+        
+        _mainCamera.orthographicSize = _zoom;
+    }
 
-		float input = Input.GetAxis("Mouse ScrollWheel");
-		if (input < 0 && zoom < maxZoom)
-		{
-			ZoomCamera(Camera.main.ScreenToWorldPoint(Input.mousePosition), -zoomScale);
-		}
-		if (input > 0 && zoom > minZoom)
-		{
-			ZoomCamera(Camera.main.ScreenToWorldPoint(Input.mousePosition), zoomScale);
-		}
+    public float GetZoom()
+    {
+        return _zoom;
+    }
 
-		transform.position = Vector3.Lerp(transform.position, targetPos, 0.6f);
-		Camera.main.orthographicSize = Mathf.Lerp(Camera.main.orthographicSize, zoom, 0.6f);
-	}
-
-	public float GetZoom()
-	{
-		return zoom;
-	}
-
-	private void ZoomCamera(Vector3 target, float scale)
-	{
-		float multiplier = (1.0f / zoom * scale);
-
-		targetPos = targetPos + (target - targetPos) * multiplier;
-		zoom -= scale;
-	}
+    private void ZoomCamera(Vector3 target, float scale)
+    {
+        var multiplier = (1.0f / _zoom * scale);
+        transform.position += (target - transform.position) * multiplier; // zoom in at mouse pointer effect
+        _zoom -= scale;
+    }
 }

@@ -6,8 +6,7 @@ public class ButtonBehavior : PartBehavior
 {
     void Awake()
     {
-        // get the toggle sprite renderer
-        SRenderer = GameObject.Find("/" + this.gameObject.name + "/Toggle").GetComponent<SpriteRenderer>();
+
     }
 
     void OnMouseUpAsButton()

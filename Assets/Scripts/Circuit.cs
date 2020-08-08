@@ -168,13 +168,7 @@ public class Circuit
 		}
 	}
 
-	public Wire[] GetWiresFromDirection(Vector2Int coords, Vector2Int direction, bool ignoreConnected)
-	{
-		float angle = Mathf.Atan2(direction.y, direction.x);
-		return null;
-	}
-
-	public List<Part> GetAllOfId(int id)
+    public List<Part> GetAllOfId(int id)
 	{
 		return _parts[id];
 	}
@@ -194,7 +188,7 @@ public class Circuit
 	{
 		GameObject tempObj = MonoBehaviour.Instantiate(nodeObj, ToVector3(coords), Quaternion.identity);
 		Part nodePart = tempObj.GetComponent<Part>();
-		nodePart.Coords = coords;
+		nodePart.Coordinates = coords;
 		nodePart.Id = _nextId;
 		AddPart(nodePart);
 		_nextId++;
@@ -223,14 +217,14 @@ public class Circuit
 	private void AddPart(Part p)
 	{
 		if (p == null) return;
-		Vector2Int coords = p.Coords;
+		Vector2Int coords = p.Coordinates;
         if (p is Wire w)
         {
             _partsGrid[coords.x, coords.y].SetWire(w, w.GetOrientation());
         }
         else
         {
-            _partsGrid[coords.x, coords.y].SetNode(p);
+            _partsGrid[coords.x, coords.y].Node = p;
             Debug.Log("Added " + p.GetType().ToString());
         }
 

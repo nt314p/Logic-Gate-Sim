@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -58,10 +57,36 @@ public class PartGrid
         }
     }
 
-    public Wire[] GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected)
+    public void Add(Part part)
     {
-        float angle = Mathf.Atan2(direction.y, direction.x);
-        return null;
+        if (part is Wire)
+        {
+
+        }
+    }
+
+    public void AddWires(List<Wire> wires)
+    {
+
+    }
+
+    private void AddWire(Wire wire)
+    {
+
+    }
+
+    public List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected)
+    {
+        if (!ignoreConnected && !IsConnected(coordinates)) return new List<Wire> { GetWire(coordinates, -direction) };
+        var wires = new List<Wire>();
+        for (var i = 0; i < 3; i++)
+        {
+            direction = new Vector2Int(-direction.y, direction.x); // rotate vector 90 deg CCW
+            var wire = GetWire(coordinates, direction);
+            if (wire != null) wires.Add(wire);
+        }
+
+        return wires;
     }
 
     public List<Part> GetPartsOfId(int id) => _parts[id];
@@ -73,23 +98,32 @@ public class PartGrid
         editParts.ForEach(p => p.State = state);
     }
 
-    // gets a Wire based on direction from the part grid
-    private Wire GetWire(Vector2Int coordinate, Vector2Int direction)
+    private bool IsConnected(Vector2Int coordinates)
     {
-        if (coordinate.x == 0 || coordinate.y == 0) return null;
-        if (direction.x == -1 || direction.y == -1)
-        { // left or bottom
-            var shifted = coordinate + direction;
-            return _partGrid[shifted.x, shifted.y].GetWire(-direction);
-        }
-        else
-        { // top or right
-            return _partGrid[coordinate.x, coordinate.y].GetWire(direction);
-        }
+        return GetWrapper(coordinates).Connected;
     }
 
-    private Part GetNode(Vector2Int coordinate)
+    // gets a Wire based on direction from the part grid
+    private Wire GetWire(Vector2Int coordinates, Vector2Int direction)
     {
-        return _partGrid[coordinate.x, coordinate.y].GetNode();
+        if (coordinates.x == 0 || coordinates.y == 0) return null;
+        if (direction.x == -1 || direction.y == -1)
+        { // left or bottom
+            var shifted = coordinates + direction;
+            return GetWrapper(shifted).GetWire(-direction);
+        }
+
+        // top or right
+        return GetWrapper(coordinates).GetWire(direction);
+    }
+
+    private Part GetNode(Vector2Int coordinates)
+    {
+        return GetWrapper(coordinates).Node;
+    }
+
+    private PartWrapper GetWrapper(Vector2Int coordinates)
+    {
+        return _partGrid[coordinates.x, coordinates.y];
     }
 }

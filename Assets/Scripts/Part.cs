@@ -24,8 +24,8 @@ public abstract class Part
             this._state = value;
         }
     }
-
-    public Vector2Int Coords { get; set; }
+        
+    public Vector2Int Coordinates { get; set; }
 
     public bool Active { get; }
 

@@ -336,7 +336,7 @@ GameObject:
   - component: {fileID: 533715315}
   - component: {fileID: 533715314}
   m_Layer: 5
-  m_Name: CoordinateText
+  m_Name: CoordinatesText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -376,6 +376,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 0.5424528, g: 0.99065644, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -513,6 +514,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68fa849c90efb6b449a8ba876c3a3e77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _coordinatesText: {fileID: 533715314}
+  _cameraGameObject: {fileID: 1809818881}
 --- !u!1 &716029936
 GameObject:
   m_ObjectHideFlags: 0
@@ -622,7 +625,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6dc2d1c6603d8a40a3e9797025169be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drawingWirePath: 0
+  DrawingWirePath: 0
 --- !u!1 &1355569890
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +737,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 806bf5a931b67c3428976fe2246ba257, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainCamera: {fileID: 1809818883}
 --- !u!20 &1809818883
 Camera:
   m_ObjectHideFlags: 0

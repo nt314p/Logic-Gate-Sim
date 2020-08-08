@@ -4,41 +4,35 @@ using UnityEngine;
 
 public class SwitchBehavior : PartBehavior
 {
-    private Transform toggle;
-    private float currY;
-    private float targetY;
-    private readonly float offset = 0.015f;
-    private readonly float targetTolerance = 0.002f;
-    private readonly float toggleSpeed = 0.14f;
+    [SerializeField] private Transform _toggle;
+    private float _currentY;
+    private float _targetY;
+    private const float Offset = 0.015f;
+    private const float TargetTolerance = 0.002f;
+    private const float ToggleSpeed = 0.14f;
 
-    void Awake()
+    private void Awake()
     {
-        targetY = -offset;
-        currY = targetY;
-        toggle = transform.Find("Toggle");
+        _targetY = -Offset;
+        _currentY = _targetY;
     }
 
     private void Update()
     {
-        toggle.localPosition = Vector3.up * currY; // new Vector3(0, currY, 0); 
+        _toggle.localPosition = Vector3.up * _currentY; // new Vector3(0, currentY, 0); 
 
-        if (Mathf.Abs(currY - targetY) < targetTolerance)
+        if (Mathf.Abs(_currentY - _targetY) < TargetTolerance)
         {
-            currY = Mathf.Sign(currY) * offset;
+            _currentY = Mathf.Sign(_currentY) * Offset;
         }
         else
         {
-            currY += toggleSpeed * Time.deltaTime * -Mathf.Sign(currY - targetY);
+            _currentY += ToggleSpeed * Time.deltaTime * -Mathf.Sign(_currentY - _targetY);
         }
-    }
-
-    public override void UpdateColor()
-    {
-        
     }
 
     public override void OnStateChanged(Part part)
     {
-        targetY = offset * (part.State ? 1 : -1);
+        _targetY = Offset * (part.State ? 1 : -1);
     }
 }

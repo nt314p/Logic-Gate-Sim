@@ -22,6 +22,7 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
     private bool _isSelected;
     public event Action<PartBehavior> SelectChanged;
     private Part _partObject;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     public Part PartObject
     {
@@ -30,11 +31,15 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
         {
             if (PartObject != null) PartObject.StateChanged -= OnStateChanged;
             this._partObject = value;
-            PartObject.StateChanged += OnStateChanged;
+            if (PartObject != null) PartObject.StateChanged += OnStateChanged;
         }
     }
 
-    public SpriteRenderer SRenderer { get; set; }
+    public SpriteRenderer SpriteRenderer
+    {
+        get => _spriteRenderer;
+        set => _spriteRenderer = value;
+    }
 
     public bool Selected
     {
@@ -68,8 +73,8 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
 
     public virtual void UpdateColor()
     {
-        SRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
-        if (this._isSelected) SRenderer.color = this.SelectedColor;
+        SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
+        if (this._isSelected) SpriteRenderer.color = this.SelectedColor;
     }
 
     public SimulationManager GetSim()

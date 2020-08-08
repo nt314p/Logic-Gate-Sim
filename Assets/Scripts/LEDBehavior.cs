@@ -6,7 +6,6 @@ public class LedBehavior : PartBehavior
 {
     private void Awake()
     {
-        this.SRenderer = this.gameObject.GetComponent<SpriteRenderer>();
         UpdateColor();
     }
 }
