@@ -220,7 +220,7 @@ public class Circuit
 		Vector2Int coords = p.Coordinates;
         if (p is Wire w)
         {
-            _partsGrid[coords.x, coords.y].SetWire(w, w.GetOrientation());
+            _partsGrid[coords.x, coords.y].SetWire(w);
         }
         else
         {

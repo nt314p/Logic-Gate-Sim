@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class PartGrid
 {
     private readonly PartWrapper[,] _partGrid;
-    private readonly IDictionary<int, List<Part>> _parts;
+    private readonly IDictionary<int, List<Part>> _partsDictionary;
 
     public PartGrid(int gridWidth, int gridHeight)
     {
-        _parts = new Dictionary<int, List<Part>>();
+        _partsDictionary = new Dictionary<int, List<Part>>();
         _partGrid = new PartWrapper[gridWidth, gridHeight];
         for (var i = 0; i < _partGrid.GetLength(0); i++)
         {
@@ -23,14 +25,14 @@ public class PartGrid
     public void TrimIds()
     {
         var nextId = 0;
-        var ids = new int[_parts.Keys.Count];
-        _parts.Keys.CopyTo(ids, 0);
+        var ids = new int[_partsDictionary.Keys.Count];
+        _partsDictionary.Keys.CopyTo(ids, 0);
         Debug.Log("Trimming Ids");
         foreach (var currentId in ids)
         {
-            if (_parts[currentId].Count == 0)
+            if (_partsDictionary[currentId].Count == 0)
             {
-                _parts.Remove(currentId);
+                _partsDictionary.Remove(currentId);
             }
             else
             {
@@ -42,9 +44,9 @@ public class PartGrid
     public void ReplaceId(int oldId, int newId) // Will overwrite parts that have id newId...
     {
         if (oldId == newId) return;
-        _parts[newId] = _parts[oldId]; // set list reference in dict to new id
-        _parts.Remove(oldId);
-        _parts[newId].ForEach(p => p.Id = newId);
+        _partsDictionary[newId] = _partsDictionary[oldId]; // set list reference in dict to new id
+        _partsDictionary.Remove(oldId);
+        _partsDictionary[newId].ForEach(p => p.Id = newId);
     }
 
     // links all part ids passed in
@@ -65,17 +67,69 @@ public class PartGrid
         }
     }
 
-    public void AddWires(List<Wire> wires)
+    public void AddWires(List<Wire> wires) // wires should be passed in with id -1
     {
+        foreach (var wire in wires)
+        {
+            AddWire(wire, false); // don't add to dictionary because it will be added at the very end
+            var surroundingWires = GetWiresFromDirection(wire.Coordinates, wire.Orientation);
+        }
+    }
+
+    public void AddWire(Wire wire, bool addToDictionary = true)
+    {
+        GetWrapper(wire.Coordinates).SetWire(wire);
+        UpdateConnection(wire);
+        if (addToDictionary)
+        {
+
+        }
 
     }
 
-    private void AddWire(Wire wire)
+
+
+    private void UpdateConnection(Wire addedWire)
     {
-
+        var wireCount = 0;
+        var coordinates = addedWire.Coordinates;
+        var direction = Vector2Int.right;
+        for (var i = 0; i < 4; i++)
+        {
+            direction = new Vector2Int(-direction.y, direction.x);
+            if (GetWire(coordinates, direction) != null) wireCount++;
+        }
+        // Special case: three wires -> four wires remain connected (unless the wire opposite to the wire being added is also unregistered)
+        switch (wireCount)
+        {
+            case 0:
+            case 1:
+            case 2:
+                GetWrapper(coordinates).Connected = false;
+                break;
+            case 3:
+                GetWrapper(coordinates).Connected = true;
+                break;
+            case 4:
+                // if the node was connected and the opposing wire to the wire being added is not unregistered
+                if (IsConnected(coordinates) && GetWire(coordinates, -addedWire.Orientation).Id != -1)
+                {
+                    break; // do nothing because the node should keep it's connection
+                }
+                GetWrapper(coordinates).Connected = false;
+                break;
+        }
     }
+    
+    /*
+    private bool ContainsUnregisteredLine(Vector2Int coordinates)
+    {
+        bool horizontal = GetWire(coordinates, Vector2Int.right).Id == -1 && GetWire(coordinates, Vector2Int.left).Id == -1;
+        bool vertical = GetWire(coordinates, Vector2Int.up).Id == GetWire(coordinates, Vector2Int.left).Id;
+    }
+    */
 
-    public List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected)
+    public List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected = false)
     {
         if (!ignoreConnected && !IsConnected(coordinates)) return new List<Wire> { GetWire(coordinates, -direction) };
         var wires = new List<Wire>();
@@ -83,13 +137,13 @@ public class PartGrid
         {
             direction = new Vector2Int(-direction.y, direction.x); // rotate vector 90 deg CCW
             var wire = GetWire(coordinates, direction);
-            if (wire != null) wires.Add(wire);
+            if (wire != null && wire.Id != -1) wires.Add(wire); // ignore wires with id -1 (unregistered)
         }
 
         return wires;
     }
 
-    public List<Part> GetPartsOfId(int id) => _parts[id];
+    public List<Part> GetPartsOfId(int id) => _partsDictionary[id];
 
     public void SetPartsOfId(int id, bool state, bool hardSet = false)
     {
@@ -101,6 +155,11 @@ public class PartGrid
     private bool IsConnected(Vector2Int coordinates)
     {
         return GetWrapper(coordinates).Connected;
+    }
+
+    private List<Wire> GetWireLine(Vector2Int coordinates, Vector2Int direction)
+    {
+        return new List<Wire> { GetWire(coordinates, direction), GetWire(coordinates, -direction) };
     }
 
     // gets a Wire based on direction from the part grid
