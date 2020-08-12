@@ -66,16 +66,28 @@ public class PartGrid
         }
     }
 
-    public void AddWires(List<Wire> wires) // wires should be passed in with id -1
+    public void AddWires(List<Wire> wires) // wires should be passed in with id -1, also should be in order
     {
-        var connectedIds = new HashSet<int>(); // using a set for unique ids only
+
         foreach (var wire in wires)
         {
             GetWrapper(wire.Coordinates).SetWire(wire);
             UpdateConnection(wire);
-            var surroundingWires = GetWiresFromDirection(wire.Coordinates, wire.Orientation);
-            surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id)); // add
+        }
 
+        var firstWire = wires[0];
+        var previousCoordinates = firstWire.Coordinates;
+        var connectedIds = new HashSet<int>(); // using a set for unique ids only
+
+        // adding the first wire's opposite direction since the for loop traversal moves in forward direction only
+        GetWiresFromDirection(firstWire.EndPoint, firstWire.Coordinates - firstWire.EndPoint).ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+
+        for (var index = 1; index < wires.Count; index++)
+        {
+            var currentCoordinates = wires[index].Coordinates;
+            var surroundingWires = GetWiresFromDirection(previousCoordinates, currentCoordinates - previousCoordinates);
+            surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id)); // add
+            previousCoordinates = currentCoordinates;
         }
     }
 
@@ -119,7 +131,6 @@ public class PartGrid
         bool vertical = GetWire(coordinates, Vector2Int.up).Id == GetWire(coordinates, Vector2Int.left).Id;
     }
     */
-    // replace coordinates and direction with just wire
     public List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected = false)
     {
         var wires = new List<Wire>();
@@ -130,8 +141,14 @@ public class PartGrid
         }
         else
         {
-            GetWiresAtCoordinates(coordinates);
+            for (var directionIndex = RotateQuarter(direction);
+                directionIndex != direction;
+                directionIndex = RotateQuarter(directionIndex))
+            {
+                wires.Add(GetWire(coordinates, directionIndex));
+            }
         }
+
         // ignore wires that are null and with with id -1 (unregistered)
         return wires.Where(wire => wire != null && wire.Id != -1).ToList();
     }
@@ -182,5 +199,10 @@ public class PartGrid
     private PartWrapper GetWrapper(Vector2Int coordinates)
     {
         return _partGrid[coordinates.x, coordinates.y];
+    }
+
+    private Vector2Int RotateQuarter(Vector2Int vector)
+    {
+        return new Vector2Int(-vector.y, vector.x);
     }
 }

@@ -10,7 +10,7 @@ public class WireBehavior : PartBehavior
 
     private void Awake()
     {
-		Vector3 direction = (Vector2) ((Wire) PartObject).GetOrientation();
+		Vector3 direction = (Vector2) ((Wire) PartObject).Orientation;
 		SpriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
 		this.transform.localScale = new Vector3(WIRE_LEN, WIRE_LEN, 1) + direction * 9 * WIRE_LEN;
 		this.transform.position = new Vector3(PartObject.Coordinates.x, PartObject.Coordinates.y, -0.01f) + direction * 0.5f;

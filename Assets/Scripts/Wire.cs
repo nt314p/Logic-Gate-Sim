@@ -24,11 +24,7 @@ public class Wire : Part
         _orientation = end - start;
     }
 
-    public Vector2Int GetEndPoint()
-    {
-        return _endPoint;
-    }
-
+    public Vector2Int EndPoint { get => _endPoint; }
     public Vector2Int Orientation { get => _orientation; }
 
 
