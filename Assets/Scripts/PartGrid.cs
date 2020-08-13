@@ -40,16 +40,24 @@ public class PartGrid
         }
     }
 
-    public void ReplaceId(int oldId, int newId) // Will overwrite parts that have id newId...
+    public void ReplaceId(int oldId, int newId)
     {
         if (oldId == newId) return;
-        _partsDictionary[newId] = _partsDictionary[oldId]; // set list reference in dict to new id
+        _partsDictionary[newId] = _partsDictionary[oldId];
         _partsDictionary.Remove(oldId);
         _partsDictionary[newId].ForEach(p => p.Id = newId);
     }
 
+    public void MergeId(int sourceId, int destinationId)
+    {
+        if (sourceId == destinationId) return;
+        _partsDictionary[destinationId].AddRange(_partsDictionary[sourceId]);
+        _partsDictionary.Remove(sourceId);
+        _partsDictionary[destinationId].ForEach(p => p.Id = destinationId);
+    }
+
     // links all part ids passed in
-    public void LinkIds(Part[] parts)
+    public void LinkPartsIds(Part[] parts)
     {
         var validPartIds = parts.Where(p => p != null).Select(p => p.Id).ToArray();
         for (var i = 1; i < validPartIds.Length; ++i)
@@ -57,6 +65,18 @@ public class PartGrid
             ReplaceId(validPartIds[i], validPartIds[0]); // link other ids to first id
         }
     }
+
+    public int LinkIds(List<int> ids)
+    {
+        var finalId = ids[0];
+        for (var index = 1; index < ids.Count; index++)
+        {
+            MergeId(ids[index], finalId);
+        }
+
+        return finalId;
+    }
+    
 
     public void Add(Part part)
     {
@@ -68,10 +88,9 @@ public class PartGrid
 
     public void AddWires(List<Wire> wires) // wires should be passed in with id -1, also should be in order
     {
-
         foreach (var wire in wires)
         {
-            GetWrapper(wire.Coordinates).SetWire(wire);
+            GetWrapper(wire.Coordinates).SetWire(wire); // adding part to the grid
             UpdateConnection(wire);
         }
 
@@ -80,14 +99,36 @@ public class PartGrid
         var connectedIds = new HashSet<int>(); // using a set for unique ids only
 
         // adding the first wire's opposite direction since the for loop traversal moves in forward direction only
-        GetWiresFromDirection(firstWire.EndPoint, firstWire.Coordinates - firstWire.EndPoint).ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+        var firstWireConnections =
+            GetWiresFromDirection(firstWire.EndPoint, firstWire.Coordinates - firstWire.EndPoint);
+        firstWireConnections.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
 
         for (var index = 1; index < wires.Count; index++)
         {
             var currentCoordinates = wires[index].Coordinates;
             var surroundingWires = GetWiresFromDirection(previousCoordinates, currentCoordinates - previousCoordinates);
-            surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id)); // add
+            surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
             previousCoordinates = currentCoordinates;
+        }
+
+        var wireId = LinkIds(connectedIds.ToList());
+
+        foreach (var wire in wires)
+        {
+            wire.Id = wireId;
+            AddPartToDictionary(wire);
+        }
+    }
+
+    public void AddPartToDictionary(Part part)
+    {
+        if (part.Active)
+        {
+            _partsDictionary[part.Id].Insert(0, part); // insert at front because part is active
+        }
+        else
+        {
+            _partsDictionary[part.Id].Add(part);
         }
     }
 
