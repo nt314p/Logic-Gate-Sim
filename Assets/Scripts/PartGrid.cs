@@ -7,9 +7,11 @@ public class PartGrid
     private readonly PartWrapper[,] _partGrid;
     private readonly IDictionary<int, List<Part>> _partsDictionary;
     private static readonly List<Vector2Int> Directions = new List<Vector2Int> { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
+    private int nextAvailableId;
 
     public PartGrid(int gridWidth, int gridHeight)
     {
+        nextAvailableId = 0;
         _partsDictionary = new Dictionary<int, List<Part>>();
         _partGrid = new PartWrapper[gridWidth, gridHeight];
         for (var i = 0; i < _partGrid.GetLength(0); i++)
@@ -40,7 +42,7 @@ public class PartGrid
         }
     }
 
-    public void ReplaceId(int oldId, int newId)
+    private void ReplaceId(int oldId, int newId)
     {
         if (oldId == newId) return;
         _partsDictionary[newId] = _partsDictionary[oldId];
@@ -48,7 +50,7 @@ public class PartGrid
         _partsDictionary[newId].ForEach(p => p.Id = newId);
     }
 
-    public void MergeId(int sourceId, int destinationId)
+    private void MergeId(int sourceId, int destinationId)
     {
         if (sourceId == destinationId) return;
         _partsDictionary[destinationId].AddRange(_partsDictionary[sourceId]);
@@ -66,24 +68,44 @@ public class PartGrid
         }
     }
 
-    public int LinkIds(List<int> ids)
+    private int LinkIds(List<int> ids)
     {
-        var finalId = ids[0];
+        var finalId = ids.Count == 0 ? GetAndIncrementNextAvailableId() : ids[0];
         for (var index = 1; index < ids.Count; index++)
         {
             MergeId(ids[index], finalId);
         }
-
         return finalId;
     }
     
-
-    public void Add(Part part)
+    public void AddPart(Part part)
     {
-        if (part is Wire)
+        if (part is Wire wire)
         {
-
+            AddWires(new List<Wire> {wire});
         }
+        else
+        {
+            AddNode(part);
+        }
+    }
+
+    private void AddNode(Part part)
+    {
+        var wrapper = GetWrapper(part.Coordinates);
+        if (wrapper.Node != null) return; // implement throwing exception
+        var surroundingWires = GetWiresAtCoordinates(part.Coordinates).Where(wire => wire != null).ToList();
+        if (surroundingWires.Count == 4 && !wrapper.Connected) // ids need to be recalculated
+        {
+            var newId = LinkIds(wrapper.GetWires().Select(wire => wire.Id).ToList());
+            part.Id = newId;
+        }
+        else
+        {
+            part.Id = GetAndIncrementNextAvailableId();
+        }
+        wrapper.Node = part;
+        wrapper.Connected = true; // a node will always connect
     }
 
     public void AddWires(List<Wire> wires) // wires should be passed in with id -1, also should be in order
@@ -120,16 +142,20 @@ public class PartGrid
         }
     }
 
-    public void AddPartToDictionary(Part part)
+    private void AddPartToDictionary(Part part)
     {
-        if (part.Active)
-        {
-            _partsDictionary[part.Id].Insert(0, part); // insert at front because part is active
-        }
+        var partId = part.Id;
+        var partsOfId = new List<Part>();
+        if (_partsDictionary.ContainsKey(partId))
+            partsOfId = _partsDictionary[partId];
         else
-        {
-            _partsDictionary[part.Id].Add(part);
-        }
+            _partsDictionary.Add(partId, partsOfId);
+        
+        if (part.Active)
+            partsOfId.Insert(0, part); // active parts go in front
+        else
+            partsOfId.Add(part);
+
     }
 
 
@@ -172,7 +198,7 @@ public class PartGrid
         bool vertical = GetWire(coordinates, Vector2Int.up).Id == GetWire(coordinates, Vector2Int.left).Id;
     }
     */
-    public List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected = false)
+    private List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected = false)
     {
         var wires = new List<Wire>();
 
@@ -194,7 +220,7 @@ public class PartGrid
         return wires.Where(wire => wire != null && wire.Id != -1).ToList();
     }
 
-    public List<Part> GetPartsOfId(int id) => _partsDictionary[id];
+    private List<Part> GetPartsOfId(int id) => _partsDictionary[id];
 
     public void SetPartsOfId(int id, bool state, bool hardSet = false)
     {
@@ -215,26 +241,20 @@ public class PartGrid
 
     private List<Wire> GetWiresAtCoordinates(Vector2Int coordinates)
     {
-        return Directions.Select(direction => (GetWire(coordinates, direction))).ToList();
+        return Directions.Select(direction => GetWire(coordinates, direction)).ToList();
     }
 
     // gets a Wire based on direction from the part grid
     private Wire GetWire(Vector2Int coordinates, Vector2Int direction)
     {
         if (coordinates.x == 0 || coordinates.y == 0) return null;
-        if (direction.x == -1 || direction.y == -1)
-        { // left or bottom
+        if (direction.x == -1 || direction.y == -1) // left or bottoms
+        { 
             var shifted = coordinates + direction;
             return GetWrapper(shifted).GetWire(-direction);
         }
 
-        // top or right
-        return GetWrapper(coordinates).GetWire(direction);
-    }
-
-    private Part GetNode(Vector2Int coordinates)
-    {
-        return GetWrapper(coordinates).Node;
+        return GetWrapper(coordinates).GetWire(direction); // top or right
     }
 
     private PartWrapper GetWrapper(Vector2Int coordinates)
@@ -242,7 +262,12 @@ public class PartGrid
         return _partGrid[coordinates.x, coordinates.y];
     }
 
-    private Vector2Int RotateQuarter(Vector2Int vector)
+    private int GetAndIncrementNextAvailableId()
+    {
+        return nextAvailableId++;
+    }
+
+    private static Vector2Int RotateQuarter(Vector2Int vector)
     {
         return new Vector2Int(-vector.y, vector.x);
     }

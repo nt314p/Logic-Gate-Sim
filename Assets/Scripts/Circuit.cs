@@ -33,6 +33,7 @@ public class Circuit
 		// foreach ()
 	}
 
+	/*
 	public void RecalculateIds()
 	{
 		Debug.Log("Recalculating!");
@@ -117,7 +118,7 @@ public class Circuit
 		{ // recalculating states for all ids
 			CalculateStateId(currentId);
 		}
-	}
+	}*/
 
 	public void TrimIds()
 	{
@@ -144,7 +145,7 @@ public class Circuit
 		var state = false;
 		foreach (var p in _parts[id])
 		{
-			if (!p.Active || state) break; // end of active parts or state = true -> can't be made false
+			if (!p.Active || state) break; // end of active parts or state = true
 			state |= p.State;
 		}
 		SetAllOfId(id, state);
@@ -192,27 +193,10 @@ public class Circuit
 		nodePart.Id = _nextId;
 		AddPart(nodePart);
 		_nextId++;
-		RecalculateIds();
+		//RecalculateIds();
 	}
 
-	public void AddWires(List<Wire> wires)
-	{
-		// wires in list are not yet in 2d grid
-
-
-
-		foreach (Wire w in wires)
-		{
-			w.Id = _nextId;
-			AddPart(w);
-		}
-
-		if (wires.Count > 0)
-		{
-			_nextId++;
-			RecalculateIds();
-		}
-	}
+	
 
 	private void AddPart(Part p)
 	{
@@ -242,34 +226,9 @@ public class Circuit
             partsGrid[coords.x, coords.y].SetNode (b);
             Debug.Log ("ADDED A BUTTON!");
         }*/
-        AddPartToDict(p);
+        // AddPartToDict(p);
 	}
 
-	private void AddPartToDict(Part part)
-	{
-		int partId = part.Id;
-		if (partId == -2 || partId == -1)
-		{
-			Debug.Log("POTATS! partId is: " + partId);
-		}
-		List<Part> partsOfId = new List<Part>();
-		if (_parts.ContainsKey(partId))
-		{ // key (id) exists
-			partsOfId = _parts[partId];
-		}
-		else
-		{ // key (id) doesn't exist, initialize list
-			_parts.Add(partId, partsOfId);
-		}
-		if (part.Active)
-		{
-			partsOfId.Insert(0, part); // inserting active part at the front
-		}
-		else
-		{
-			partsOfId.Add(part); // adding passive part to the end
-		}
-	}
 
 	private bool UpdatePartIdInDict(Part part, int newId)
 	{
@@ -280,7 +239,7 @@ public class Circuit
 			partsOfId.Remove(part);
 		}
 		part.Id = newId;
-		AddPartToDict(part);
+		// AddPartToDict(part);
 		return idExists && part.Id != newId; // prevent infinite loops
 	}
 
@@ -289,20 +248,7 @@ public class Circuit
 		return (Vector3)(Vector2)vecInt;
 	}
 
-	// gets a Wire based on direction from the part grid
-	private Wire GetWire(Vector2Int coord, Vector2Int direction)
-	{
-		if (coord.x == 0 || coord.y == 0) return null;
-		if (direction.x == -1 || direction.y == -1)
-		{ // left or bottom
-			Vector2Int shifted = coord + direction;
-			return _partsGrid[shifted.x, shifted.y].GetWire(-direction);
-		}
-		else
-		{ // top or right
-			return _partsGrid[coord.x, coord.y].GetWire(direction);
-		}
-	}
+	
 	/*
     private Part GetNode(Vector2Int coord) {
         if (Vector2.ang)

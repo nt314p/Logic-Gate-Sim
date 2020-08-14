@@ -16,7 +16,6 @@ public class GridController : MonoBehaviour
 
 		_gridMaterial.mainTextureScale = new Vector2(Width, Height);
 		_gridPlane.transform.localScale = new Vector3(Width, Height, 1);
-		// gridPlane.transform.position = new Vector3 (Width * 0.5f - 0.5f, Height * 0.5f - 0.5f, 0);
 		_gridPlane.transform.position = new Vector3(Width / 2f - 0.5f, Height / 2f - 0.5f, 0);
 	}
 

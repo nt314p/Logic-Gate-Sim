@@ -8,7 +8,6 @@ public class CanvasController : MonoBehaviour
 	[SerializeField] private Text _coordinatesText;
 	[SerializeField] private GameObject _cameraGameObject;
 	
-	// Update is called once per frame
 	void Update()
 	{
 		var temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);

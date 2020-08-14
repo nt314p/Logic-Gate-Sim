@@ -61,28 +61,28 @@ public class SimulationManager : MonoBehaviour
 
         // Debug.Log(selectedPart);
 
-        Vector3 temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2Int coord = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+        var temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        var mouseCoordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
 
         if (Input.GetMouseButtonDown(0))
         {
             switch (_selectedPart)
             {
                 case "Wire":
-                    if (IsWithinBounds(coord))
+                    if (IsWithinBounds(mouseCoordinates))
                     {
-                        _wirePath.Add(coord);
+                        _wirePath.Add(mouseCoordinates);
                         DrawingWirePath = true;
                     }
                     break;
                 case "led":
-                    _currentCircuit.AddNode(Led, coord);
+                    _currentCircuit.AddNode(Led, mouseCoordinates);
                     break;
                 case "switch":
-                    _currentCircuit.AddNode(Switch, coord);
+                    _currentCircuit.AddNode(Switch, mouseCoordinates);
                     break;
                 case "button":
-                    _currentCircuit.AddNode(Button, coord);
+                    _currentCircuit.AddNode(Button, mouseCoordinates);
                     break;
                 default:
                     break;
@@ -93,26 +93,27 @@ public class SimulationManager : MonoBehaviour
         {
             if (DrawingWirePath)
             {
-                Vector2Int prevCoord = _wirePath[_wirePath.Count - 1];
+                var previousCoordinates = _wirePath[_wirePath.Count - 1];
 
                 // coordinate is unique and in grid bounds
-                if (!(coord.Equals(prevCoord)) && IsWithinBounds(coord))
+                if (!(mouseCoordinates.Equals(previousCoordinates)) && IsWithinBounds(mouseCoordinates))
                 {
                     // is the Wire going back on itself
-                    if (_wirePath.Count >= 2 && _wirePath[_wirePath.Count - 2] == coord)
+                    if (_wirePath.Count >= 2 && _wirePath[_wirePath.Count - 2] == mouseCoordinates)
                     {
                         Destroy(_wiresInPath[_wiresInPath.Count - 1]); // removing Wire
                         _wirePath.RemoveAt(_wirePath.Count - 1);
                         _wiresInPath.RemoveAt(_wiresInPath.Count - 1);
                     }
                     else
-                    { // adding new Wire
-                        List<Vector2Int> interpolated = Interpolate(prevCoord, coord);
-                        for (int i = 0; i < interpolated.Count; i++)
+                    {
+                        // adding new Wire
+                        var interpolated = Interpolate(previousCoordinates, mouseCoordinates);
+                        foreach (var wireCoordinate in interpolated)
                         {
-                            _wirePath.Add(interpolated[i]);
-                            Vector2Int start = _wirePath[_wirePath.Count - 2];
-                            Vector2Int end = _wirePath[_wirePath.Count - 1];
+                            _wirePath.Add(wireCoordinate);
+                            var start = _wirePath[_wirePath.Count - 2];
+                            var end = _wirePath[_wirePath.Count - 1];
                             _wiresInPath.Add(Instantiate(Wire, ToVector3(start), Quaternion.identity));
                             _wiresInPath[_wiresInPath.Count - 1].GetComponent<WireBehavior>();//.Initialize(start, end);
                         }
@@ -124,9 +125,9 @@ public class SimulationManager : MonoBehaviour
         if (!Input.GetMouseButtonUp(0)) return;
 
         var wireList = new List<WireBehavior>();
-        for (var i = 0; i < _wiresInPath.Count; i++)
+        foreach (var wireBehavior in _wiresInPath)
         {
-            wireList.Add(_wiresInPath[i].GetComponent<WireBehavior>());
+            wireList.Add(wireBehavior.GetComponent<WireBehavior>());
         }
         if (wireList.Count > 0)
             _currentCircuit.AddWires(wireList.Select(w => (Wire)w.PartObject).ToList());
@@ -209,7 +210,7 @@ public class SimulationManager : MonoBehaviour
         return ret;
     }
 
-    private bool IsWithinBounds(Vector2Int vec)
+    private static bool IsWithinBounds(Vector2Int vec)
     {
         var clamped = new Vector2Int(vec.x, vec.y);
         clamped.Clamp(Vector2Int.zero, new Vector2Int(49, 49)); // fix hardcode
