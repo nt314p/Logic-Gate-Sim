@@ -70,7 +70,7 @@ public class PartGrid
 
     private int LinkIds(List<int> ids)
     {
-        var finalId = ids.Count == 0 ? GetAndIncrementNextAvailableId() : ids[0];
+        var finalId = ids.Count == 0 ? GetAndFindNextAvailableId() : ids[0];
         for (var index = 1; index < ids.Count; index++)
         {
             MergeId(ids[index], finalId);
@@ -102,7 +102,7 @@ public class PartGrid
         }
         else
         {
-            part.Id = GetAndIncrementNextAvailableId();
+            part.Id = GetAndFindNextAvailableId();
         }
         wrapper.Node = part;
         wrapper.Connected = true; // a node will always connect
@@ -262,9 +262,24 @@ public class PartGrid
         return _partGrid[coordinates.x, coordinates.y];
     }
 
-    private int GetAndIncrementNextAvailableId()
+    private int GetAndFindNextAvailableId()
     {
-        return nextAvailableId++;
+        nextAvailableId = FindNextAvailableId();
+        var id = nextAvailableId;
+        nextAvailableId++;
+        nextAvailableId = FindNextAvailableId();
+        return id;
+    }
+
+    private int FindNextAvailableId()
+    {
+        var testId = nextAvailableId;
+        while (_partsDictionary.ContainsKey(testId))
+        {
+            testId++;
+        }
+
+        return testId;
     }
 
     private static Vector2Int RotateQuarter(Vector2Int vector)
