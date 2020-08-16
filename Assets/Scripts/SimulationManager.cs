@@ -41,7 +41,7 @@ public class SimulationManager : MonoBehaviour
         _selectedParts = new List<PartBehavior>();
 
         _currentCircuit = new Circuit(GridController.Width, GridController.Height);
-        _currentCircuit.RecalculateIds();
+        //_currentCircuit.RecalculateIds();
     }
 
     // Update is called once per frame
@@ -76,13 +76,13 @@ public class SimulationManager : MonoBehaviour
                     }
                     break;
                 case "led":
-                    _currentCircuit.AddNode(Led, mouseCoordinates);
+                    //_currentCircuit.AddNode(Led, mouseCoordinates);
                     break;
                 case "switch":
-                    _currentCircuit.AddNode(Switch, mouseCoordinates);
+                    //_currentCircuit.AddNode(Switch, mouseCoordinates);
                     break;
                 case "button":
-                    _currentCircuit.AddNode(Button, mouseCoordinates);
+                    //_currentCircuit.AddNode(Button, mouseCoordinates);
                     break;
                 default:
                     break;

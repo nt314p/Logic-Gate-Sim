@@ -21,7 +21,7 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
 
     private bool _isSelected;
     public event Action<PartBehavior> SelectChanged;
-    private Part _partObject;
+    [SerializeField] protected Part _partObject;
     [SerializeField] private SpriteRenderer _spriteRenderer;
 
     public Part PartObject
@@ -48,7 +48,6 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
         {
             if (this._isSelected != value) SelectChanged?.Invoke(this);
             this._isSelected = value;
-            GetSim().ToggleSelected(this); // not sure about this line...
         }
     }
 
@@ -88,7 +87,7 @@ public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
         if (Input.GetKey(KeyCode.LeftControl) && PartObject.Active)
         {
             PartObject.State = !PartObject.State;
-            GetSim().GetCircuit().CalculateStateId(PartObject.Id);
+            // GetSim().GetCircuit().CalculateStateId(PartObject.Id);
         }
         else
         {

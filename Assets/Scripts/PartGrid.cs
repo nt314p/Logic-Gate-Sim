@@ -5,14 +5,14 @@ using UnityEngine;
 public class PartGrid
 {
     private readonly PartWrapper[,] _partGrid;
-    private readonly IDictionary<int, List<Part>> _partsDictionary;
+    private readonly IDictionary<int, List<Part>> _partDictionary;
     private static readonly List<Vector2Int> Directions = new List<Vector2Int> { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
-    private int nextAvailableId;
+    private int _nextAvailableId;
 
     public PartGrid(int gridWidth, int gridHeight)
     {
-        nextAvailableId = 0;
-        _partsDictionary = new Dictionary<int, List<Part>>();
+        _nextAvailableId = 0;
+        _partDictionary = new Dictionary<int, List<Part>>();
         _partGrid = new PartWrapper[gridWidth, gridHeight];
         for (var i = 0; i < _partGrid.GetLength(0); i++)
         {
@@ -26,14 +26,14 @@ public class PartGrid
     public void TrimIds()
     {
         var nextId = 0;
-        var ids = new int[_partsDictionary.Keys.Count];
-        _partsDictionary.Keys.CopyTo(ids, 0);
+        var ids = new int[_partDictionary.Keys.Count];
+        _partDictionary.Keys.CopyTo(ids, 0);
         Debug.Log("Trimming Ids");
         foreach (var currentId in ids)
         {
-            if (_partsDictionary[currentId].Count == 0)
+            if (_partDictionary[currentId].Count == 0)
             {
-                _partsDictionary.Remove(currentId);
+                _partDictionary.Remove(currentId);
             }
             else
             {
@@ -42,47 +42,70 @@ public class PartGrid
         }
     }
 
+    private void RebuildDictionary() // uses the part grid to rebuild the dict
+    {
+
+    }
+
+    // calculates the state of an id based on the states of its active components
+    public void CalculateStateId(int id)
+    {
+        var state = false;
+        foreach (var p in _partDictionary[id])
+        {
+            if (!p.Active || state) break; // end of active parts or state = true
+            state |= p.State;
+        }
+        SetAllOfId(id, state);
+    }
+
+    // hard set sets all components, soft set will ignore active components
+    private void SetAllOfId(int id, bool state, bool hardSet = false)
+    {
+        var editParts = GetAllOfId(id);
+        if (!hardSet) // soft set filters out active parts
+        { 
+            editParts = editParts.Where(p => !p.Active).ToList();
+        }
+        editParts.ForEach(p => p.State = state);
+    }
+
+    private List<Part> GetAllOfId(int id)
+    {
+        return _partDictionary[id];
+    }
+
     private void ReplaceId(int oldId, int newId)
     {
         if (oldId == newId) return;
-        _partsDictionary[newId] = _partsDictionary[oldId];
-        _partsDictionary.Remove(oldId);
-        _partsDictionary[newId].ForEach(p => p.Id = newId);
+        _partDictionary[newId] = _partDictionary[oldId];
+        _partDictionary.Remove(oldId);
+        _partDictionary[newId].ForEach(p => p.Id = newId);
     }
 
     private void MergeId(int sourceId, int destinationId)
     {
         if (sourceId == destinationId) return;
-        _partsDictionary[destinationId].AddRange(_partsDictionary[sourceId]);
-        _partsDictionary.Remove(sourceId);
-        _partsDictionary[destinationId].ForEach(p => p.Id = destinationId);
-    }
-
-    // links all part ids passed in
-    public void LinkPartsIds(Part[] parts)
-    {
-        var validPartIds = parts.Where(p => p != null).Select(p => p.Id).ToArray();
-        for (var i = 1; i < validPartIds.Length; ++i)
-        {
-            ReplaceId(validPartIds[i], validPartIds[0]); // link other ids to first id
-        }
+        _partDictionary[destinationId].AddRange(_partDictionary[sourceId]);
+        _partDictionary.Remove(sourceId);
+        _partDictionary[destinationId].ForEach(p => p.Id = destinationId);
     }
 
     private int LinkIds(List<int> ids)
     {
-        var finalId = ids.Count == 0 ? GetAndFindNextAvailableId() : ids[0];
+        var finalId = ids.Count == 0 ? GetNextAvailableId() : ids[0];
         for (var index = 1; index < ids.Count; index++)
         {
             MergeId(ids[index], finalId);
         }
         return finalId;
     }
-    
+
     public void AddPart(Part part)
     {
         if (part is Wire wire)
         {
-            AddWires(new List<Wire> {wire});
+            AddWires(new List<Wire> { wire });
         }
         else
         {
@@ -102,7 +125,7 @@ public class PartGrid
         }
         else
         {
-            part.Id = GetAndFindNextAvailableId();
+            part.Id = GetNextAvailableId();
         }
         wrapper.Node = part;
         wrapper.Connected = true; // a node will always connect
@@ -146,11 +169,11 @@ public class PartGrid
     {
         var partId = part.Id;
         var partsOfId = new List<Part>();
-        if (_partsDictionary.ContainsKey(partId))
-            partsOfId = _partsDictionary[partId];
+        if (_partDictionary.ContainsKey(partId))
+            partsOfId = _partDictionary[partId];
         else
-            _partsDictionary.Add(partId, partsOfId);
-        
+            _partDictionary.Add(partId, partsOfId);
+
         if (part.Active)
             partsOfId.Insert(0, part); // active parts go in front
         else
@@ -191,13 +214,6 @@ public class PartGrid
         }
     }
 
-    /*
-    private bool ContainsUnregisteredLine(Vector2Int coordinates)
-    {
-        bool horizontal = GetWire(coordinates, Vector2Int.right).Id == -1 && GetWire(coordinates, Vector2Int.left).Id == -1;
-        bool vertical = GetWire(coordinates, Vector2Int.up).Id == GetWire(coordinates, Vector2Int.left).Id;
-    }
-    */
     private List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected = false)
     {
         var wires = new List<Wire>();
@@ -220,7 +236,7 @@ public class PartGrid
         return wires.Where(wire => wire != null && wire.Id != -1).ToList();
     }
 
-    private List<Part> GetPartsOfId(int id) => _partsDictionary[id];
+    private List<Part> GetPartsOfId(int id) => _partDictionary[id];
 
     public void SetPartsOfId(int id, bool state, bool hardSet = false)
     {
@@ -234,11 +250,6 @@ public class PartGrid
         return GetWrapper(coordinates).Connected;
     }
 
-    private List<Wire> GetWireLine(Vector2Int coordinates, Vector2Int direction)
-    {
-        return new List<Wire> { GetWire(coordinates, direction), GetWire(coordinates, -direction) };
-    }
-
     private List<Wire> GetWiresAtCoordinates(Vector2Int coordinates)
     {
         return Directions.Select(direction => GetWire(coordinates, direction)).ToList();
@@ -249,7 +260,7 @@ public class PartGrid
     {
         if (coordinates.x == 0 || coordinates.y == 0) return null;
         if (direction.x == -1 || direction.y == -1) // left or bottoms
-        { 
+        {
             var shifted = coordinates + direction;
             return GetWrapper(shifted).GetWire(-direction);
         }
@@ -262,23 +273,18 @@ public class PartGrid
         return _partGrid[coordinates.x, coordinates.y];
     }
 
-    private int GetAndFindNextAvailableId()
+    private int GetNextAvailableId()
     {
-        nextAvailableId = FindNextAvailableId();
-        var id = nextAvailableId;
-        nextAvailableId++;
-        nextAvailableId = FindNextAvailableId();
-        return id;
+        _nextAvailableId = FindNextAvailableId();
+        return _nextAvailableId++;
     }
 
     private int FindNextAvailableId()
     {
-        var testId = nextAvailableId;
-        while (_partsDictionary.ContainsKey(testId))
-        {
+        var testId = _nextAvailableId;
+        while (_partDictionary.ContainsKey(testId))
             testId++;
-        }
-
+        
         return testId;
     }
 
