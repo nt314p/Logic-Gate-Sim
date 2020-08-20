@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _coordinatesText: {fileID: 533715314}
-  _cameraGameObject: {fileID: 1809818881}
+  _mainCamera: {fileID: 1809818883}
 --- !u!1 &716029936
 GameObject:
   m_ObjectHideFlags: 0
@@ -626,6 +626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DrawingWirePath: 0
+  _mainCamera: {fileID: 1809818883}
 --- !u!1 &1354055481
 GameObject:
   m_ObjectHideFlags: 0

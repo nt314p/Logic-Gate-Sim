@@ -1,17 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class CanvasController : MonoBehaviour
+namespace LogicGateSimulator
 {
-	[SerializeField] private Text _coordinatesText;
-	[SerializeField] private GameObject _cameraGameObject;
-	
-	void Update()
+	public class CanvasController : MonoBehaviour
 	{
-		var temp = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-		var coordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-		_coordinatesText.text = coordinates.ToString();
+		[SerializeField] private Text _coordinatesText;
+		[SerializeField] private Camera _mainCamera;
+	
+		private void Update()
+		{
+			var temp = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+			var coordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
+			_coordinatesText.text = coordinates.ToString();
+		}
 	}
 }

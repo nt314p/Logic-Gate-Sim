@@ -1,37 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class GridController : MonoBehaviour
+namespace LogicGateSimulator
 {
-	public static int Width = 30;
-	public static int Height = 30;
-	private Material _gridMaterial;
-	private GameObject _gridPlane;
-
-	private void Start()
+	public class GridController : MonoBehaviour
 	{
-		_gridPlane = this.gameObject;
-		_gridMaterial = _gridPlane.GetComponent<Renderer>().material;
+		public static int Width = 30;
+		public static int Height = 30;
+		private Material _gridMaterial;
+		private GameObject _gridPlane;
 
-		_gridMaterial.mainTextureScale = new Vector2(Width, Height);
-		_gridPlane.transform.localScale = new Vector3(Width, Height, 1);
-		_gridPlane.transform.position = new Vector3(Width / 2f - 0.5f, Height / 2f - 0.5f, 0);
-	}
+		private void Start()
+		{
+			_gridPlane = this.gameObject;
+			_gridMaterial = _gridPlane.GetComponent<Renderer>().material;
 
-	private void OnMouseDown()
-	{
-		Debug.Log("Mouse down on plane!");
-		SimulationManager.Sim().ClearSelected();
-	}
+			_gridMaterial.mainTextureScale = new Vector2(Width, Height);
+			_gridPlane.transform.localScale = new Vector3(Width, Height, 1);
+			_gridPlane.transform.position = new Vector3(Width / 2f - 0.5f, Height / 2f - 0.5f, 0);
+		}
 
-	public void SetWidth(int width)
-	{
-		GridController.Width = width;
-	}
+		private void OnMouseDown()
+		{
+			Debug.Log("Mouse down on plane!");
+			SimulationManager.Sim().ClearSelected();
+		}
 
-	public void SetHeight(int height)
-	{
-		GridController.Height = height;
+		public void SetWidth(int width)
+		{
+			GridController.Width = width;
+		}
+
+		public void SetHeight(int height)
+		{
+			GridController.Height = height;
+		}
 	}
 }
