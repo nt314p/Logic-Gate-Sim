@@ -1,4 +1,5 @@
-﻿using LogicGateSimulator.Parts;
+﻿using System;
+using LogicGateSimulator.Parts;
 using UnityEngine;
 
 namespace LogicGateSimulator.PartBehaviors
@@ -6,6 +7,7 @@ namespace LogicGateSimulator.PartBehaviors
 	public class WireBehavior : PartBehavior
 	{
 		private const float WireLen = 1.38f;
+		
 
 		private void Awake()
 		{

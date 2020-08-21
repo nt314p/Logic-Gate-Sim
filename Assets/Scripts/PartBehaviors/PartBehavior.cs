@@ -22,9 +22,10 @@ namespace LogicGateSimulator.PartBehaviors
 
         private bool _isSelected;
         public event Action<PartBehavior> SelectChanged;
-        [SerializeField] private Part _partObject;
+        [SerializeReference] private Part _partObject;
+        [SerializeReference] protected Type PartType;
         [SerializeField] private SpriteRenderer _spriteRenderer;
-        
+
         public Part PartObject
         {
             get => this._partObject;

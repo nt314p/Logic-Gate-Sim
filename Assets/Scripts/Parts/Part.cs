@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace LogicGateSimulator.Parts
 {
+    [Serializable]
     public abstract class Part
     {
         private bool _state;

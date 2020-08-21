@@ -625,6 +625,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6dc2d1c6603d8a40a3e9797025169be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WirePrefabBehavior: {fileID: 1695365819215517148, guid: b304bbf2268a4354fae69cae84ac76d2,
+    type: 3}
+  LedPrefabBehavior: {fileID: 527445061971236130, guid: 5d4aa4d7f707aaa449c63e89b771ebbf,
+    type: 3}
+  SwitchPrefabBehavior: {fileID: 3563653744314743143, guid: de06d5f50953d76438d12192dc312f65,
+    type: 3}
+  ButtonPrefabBehavior: {fileID: 6005799438825312331, guid: 4039e5312e5878e49ab9b51649d0fa12,
+    type: 3}
   DrawingWirePath: 0
   _mainCamera: {fileID: 1809818883}
 --- !u!1 &1354055481

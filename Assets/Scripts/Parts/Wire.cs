@@ -11,7 +11,6 @@ namespace LogicGateSimulator.Parts
         public Wire(Vector2Int start, Vector2Int end, int id = -1) : base(false)
         {
             this.State = false;
-            this.Coordinates = start;
             this.Id = id;
 
             if ((start.x > end.x && start.y == end.y) || (start.y > end.y && start.x == end.x))
@@ -20,7 +19,8 @@ namespace LogicGateSimulator.Parts
                 start = end;
                 end = tmp;
             }
-
+            
+            this.Coordinates = start;
             _endPoint = end;
             Orientation = end - start;
         }

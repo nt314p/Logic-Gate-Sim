@@ -10,11 +10,11 @@ namespace LogicGateSimulator
     public class SimulationManager : MonoBehaviour
     {
         private static SimulationManager _instance = null;
-        public static GameObject WirePrefab;
-        public static GameObject Led;
-        public static GameObject Switch;
-        public static GameObject Button;
-        private List<GameObject> _wiresInPath;
+        public WireBehavior WirePrefabBehavior;
+        public LedBehavior LedPrefabBehavior;
+        public SwitchBehavior SwitchPrefabBehavior;
+        public ButtonBehavior ButtonPrefabBehavior;
+        private List<WireBehavior> _wiresInPath;
         private List<Vector2Int> _wirePath;
         public bool DrawingWirePath;
         private string _selectedPart;
@@ -34,13 +34,8 @@ namespace LogicGateSimulator
         {
             Application.targetFrameRate = 60;
             _instance = this;
-            WirePrefab = Resources.Load("Prefabs/Wire") as GameObject;
-            Led = Resources.Load("Prefabs/LED") as GameObject;
-            Switch = Resources.Load("Prefabs/Switch") as GameObject;
-            Button = Resources.Load("Prefabs/Button") as GameObject;
-
             _wirePath = new List<Vector2Int>();
-            _wiresInPath = new List<GameObject>();
+            _wiresInPath = new List<WireBehavior>();
             DrawingWirePath = false;
             _selectedPart = "";
             _selectedParts = new List<PartBehavior>();
@@ -119,9 +114,10 @@ namespace LogicGateSimulator
                                 _wirePath.Add(wireCoordinate);
                                 var start = _wirePath[_wirePath.Count - 2];
                                 var end = _wirePath[_wirePath.Count - 1];
-                                _wiresInPath.Add(Instantiate(WirePrefab, ToVector3(start), Quaternion.identity));
-                                var wireBehavior = _wiresInPath[_wiresInPath.Count - 1].GetComponent<WireBehavior>();
+                                var wireBehavior = Instantiate(WirePrefabBehavior, ToVector3(start),
+                                    Quaternion.identity);
                                 wireBehavior.PartObject = new Wire(start, end);
+                                _wiresInPath.Add(wireBehavior);
                             }
                         }
                     }
@@ -129,18 +125,21 @@ namespace LogicGateSimulator
             }
 
             if (!Input.GetMouseButtonUp(0)) return;
-
-            var wireList = new List<WireBehavior>();
-            foreach (var wireBehavior in _wiresInPath)
-            {
-                wireList.Add(wireBehavior.GetComponent<WireBehavior>());
-            }
-            if (wireList.Count > 0)
-                _currentCircuit.AddWires(wireList.Select(w => (Wire)w.PartObject).ToList());
-            _wiresInPath = new List<GameObject>(); // resetting variables
+            
+            if (_wiresInPath.Count > 0)
+                _currentCircuit.AddWires(_wiresInPath.Select(w => (Wire)w.PartObject).ToList());
+            
+            _wiresInPath.Clear(); // resetting variables
             _wirePath = new List<Vector2Int>();
             DrawingWirePath = false;
+        }
 
+        public void AddPart(PartBehavior partBehavior, Vector2Int coordinates)
+        {
+            if (partBehavior is WireBehavior) return;
+            var instantiatedPartBehavior = Instantiate(partBehavior, ToVector3(coordinates), Quaternion.identity);
+            instantiatedPartBehavior.PartObject = new Led();
+            _currentCircuit.AddPart(instantiatedPartBehavior.PartObject);
         }
 
         public string GetSelectedPart()
