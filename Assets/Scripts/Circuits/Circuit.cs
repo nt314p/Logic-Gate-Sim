@@ -7,8 +7,20 @@ namespace LogicGateSimulator.Circuits
     {
         private readonly PartGrid _partGrid;
 
+        public int GridWidth
+        {
+            get;
+        }
+
+        public int GridHeight
+        {
+            get;
+        }
+        
         public Circuit(int gridWidth, int gridHeight)
         {
+            GridWidth = gridWidth;
+            GridHeight = gridHeight;
             _partGrid = new PartGrid(gridWidth, gridHeight);
         }
 

@@ -1,7 +1,10 @@
-﻿namespace LogicGateSimulator.PartBehaviors
+﻿using System;
+
+namespace LogicGateSimulator.PartBehaviors
 {
     public class ButtonBehavior : PartBehavior
     {
+        public override Type PartType => typeof(ButtonBehavior);
         void Awake()
         {
 

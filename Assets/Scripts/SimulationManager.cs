@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LogicGateSimulator.Circuits;
 using LogicGateSimulator.PartBehaviors;
@@ -63,7 +64,7 @@ namespace LogicGateSimulator
 
             var temp = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
             var mouseCoordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
-
+            mouseCoordinates = ClampedVectorInBounds(mouseCoordinates); // force clamp
             if (Input.GetMouseButtonDown(0))
             {
                 switch (_selectedPart)
@@ -76,13 +77,13 @@ namespace LogicGateSimulator
                         }
                         break;
                     case "led":
-                        //_currentCircuit.AddPart(Led);
+                        AddPart(LedPrefabBehavior, mouseCoordinates);
                         break;
                     case "switch":
-                        //_currentCircuit.AddNode(Switch, mouseCoordinates);
+                        AddPart(SwitchPrefabBehavior, mouseCoordinates);
                         break;
                     case "button":
-                        //_currentCircuit.AddNode(Button, mouseCoordinates);
+                        AddPart(ButtonPrefabBehavior, mouseCoordinates);
                         break;
                     default:
                         break;
@@ -138,7 +139,8 @@ namespace LogicGateSimulator
         {
             if (partBehavior is WireBehavior) return;
             var instantiatedPartBehavior = Instantiate(partBehavior, ToVector3(coordinates), Quaternion.identity);
-            instantiatedPartBehavior.PartObject = new Led();
+            var partType = instantiatedPartBehavior.PartType;
+            instantiatedPartBehavior.PartObject = Activator.CreateInstance(partType) as Part;
             _currentCircuit.AddPart(instantiatedPartBehavior.PartObject);
         }
 
@@ -215,11 +217,16 @@ namespace LogicGateSimulator
             return ret;
         }
 
-        private static bool IsWithinBounds(Vector2Int vec)
+        private Vector2Int ClampedVectorInBounds(Vector2Int vector)
         {
-            var clamped = new Vector2Int(vec.x, vec.y);
-            clamped.Clamp(Vector2Int.zero, new Vector2Int(49, 49)); // fix hardcode
-            return clamped.Equals(vec);
+            var clamped = new Vector2Int(vector.x, vector.y);
+            clamped.Clamp(Vector2Int.zero, new Vector2Int(_currentCircuit.GridWidth - 1, _currentCircuit.GridHeight - 1));
+            return clamped;
+        }
+
+        private bool IsWithinBounds(Vector2Int vector)
+        {
+            return vector.Equals(ClampedVectorInBounds(vector));
         }
 
         public static SimulationManager Sim()

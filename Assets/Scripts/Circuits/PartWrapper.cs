@@ -32,7 +32,8 @@ namespace LogicGateSimulator.Circuits
 
         public Wire GetWire(Vector2Int direction)
         {
-            return _wires[direction];
+            if (direction == Vector2Int.up || direction == Vector2Int.right) return _wires[direction];
+            return null;
         }
 
         public List<Wire> GetWires()

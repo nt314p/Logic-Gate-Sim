@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LogicGateSimulator.Parts;
 using UnityEngine;
@@ -11,10 +12,14 @@ namespace LogicGateSimulator.Circuits
         private readonly IDictionary<int, List<Part>> _partDictionary;
         private static readonly List<Vector2Int> Directions = new List<Vector2Int> { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
         private int _nextAvailableId;
+        private readonly int _gridWidth;
+        private readonly int _gridHeight;
 
         public PartGrid(int gridWidth, int gridHeight)
         {
             _nextAvailableId = 0;
+            _gridWidth = gridWidth;
+            _gridHeight = gridHeight;
             _partDictionary = new Dictionary<int, List<Part>>();
             _partGrid = new PartWrapper[gridWidth, gridHeight];
             for (var i = 0; i < _partGrid.GetLength(0); i++)
@@ -154,6 +159,8 @@ namespace LogicGateSimulator.Circuits
             for (var index = 1; index < wires.Count; index++)
             {
                 var currentCoordinates = wires[index].Coordinates;
+                if (Math.Abs((currentCoordinates - previousCoordinates).magnitude - 1) > 0.001f)
+                    currentCoordinates = wires[index].EndPoint;
                 var surroundingWires = GetWiresFromDirection(previousCoordinates, currentCoordinates - previousCoordinates);
                 surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
                 previousCoordinates = currentCoordinates;
@@ -261,19 +268,22 @@ namespace LogicGateSimulator.Circuits
         // gets a Wire based on direction from the part grid
         private Wire GetWire(Vector2Int coordinates, Vector2Int direction)
         {
-            if (coordinates.x == 0 || coordinates.y == 0) return null;
-            if (direction.x == -1 || direction.y == -1) // left or bottoms
-            {
-                var shifted = coordinates + direction;
-                return GetWrapper(shifted).GetWire(-direction);
-            }
-
-            return GetWrapper(coordinates).GetWire(direction); // top or right
+            // if (coordinates.x == 0 || coordinates.y == 0) return null;
+            if (direction == Vector2Int.up || direction == Vector2Int.right)
+                return GetWrapper(coordinates).GetWire(direction);
+            
+            var shifted = coordinates + direction;
+            var wrapper = GetWrapper(shifted);
+            return wrapper?.GetWire(-direction);
         }
 
         private PartWrapper GetWrapper(Vector2Int coordinates)
         {
-            return _partGrid[coordinates.x, coordinates.y];
+            var x = coordinates.x;
+            var y = coordinates.y;
+            if (x >= 0 && x < _gridWidth && y >= 0 && y < _gridHeight)
+                return _partGrid[x, y];
+            return null;
         }
 
         private int GetNextAvailableId()

@@ -22,10 +22,9 @@ namespace LogicGateSimulator.PartBehaviors
 
         private bool _isSelected;
         public event Action<PartBehavior> SelectChanged;
-        [SerializeReference] private Part _partObject;
-        [SerializeReference] protected Type PartType;
+        private Part _partObject;
         [SerializeField] private SpriteRenderer _spriteRenderer;
-
+        
         public Part PartObject
         {
             get => this._partObject;
@@ -36,6 +35,11 @@ namespace LogicGateSimulator.PartBehaviors
                 if (PartObject != null) PartObject.StateChanged += OnStateChanged;
                 OnPartObjectChanged();
             }
+        }
+
+        public abstract Type PartType
+        {
+            get;
         }
 
         public SpriteRenderer SpriteRenderer

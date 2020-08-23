@@ -1,4 +1,5 @@
-﻿using LogicGateSimulator.Parts;
+﻿using System;
+using LogicGateSimulator.Parts;
 using UnityEngine;
 
 namespace LogicGateSimulator.PartBehaviors
@@ -11,6 +12,7 @@ namespace LogicGateSimulator.PartBehaviors
         private const float Offset = 0.015f;
         private const float TargetTolerance = 0.002f;
         private const float ToggleSpeed = 0.14f;
+        public override Type PartType => typeof(Switch);
 
         private void Awake()
         {

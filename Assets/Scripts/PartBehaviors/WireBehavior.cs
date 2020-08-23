@@ -7,7 +7,7 @@ namespace LogicGateSimulator.PartBehaviors
 	public class WireBehavior : PartBehavior
 	{
 		private const float WireLen = 1.38f;
-		
+		public override Type PartType => typeof(Wire);
 
 		private void Awake()
 		{
