@@ -1,18 +1,15 @@
 ﻿using System;
+using LogicGateSimulator.Parts;
 
 namespace LogicGateSimulator.PartBehaviors
 {
     public class ButtonBehavior : PartBehavior
     {
-        public override Type PartType => typeof(ButtonBehavior);
-        void Awake()
-        {
-
-        }
+        public override Type PartType => typeof(Button);
 
         private void OnMouseUpAsButton()
         {
-            PartObject.State = false; // untoggle button
+            // PartObject.State = false; // untoggle button
             //GetSim().GetCircuit().CalculateStateId(PartObject.Id); // fix this sketchy code
             // perhaps add a "updated" boolean that is set if the state has been updated
             // then the Circuit iterates through active parts and sees if any parts have been updated

@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 
 namespace LogicGateSimulator.PartBehaviors
 {
-    public abstract class PartBehavior : MonoBehaviour, IPointerDownHandler
+    public abstract class PartBehavior : MonoBehaviour//, IPointerDownHandler
     {
         /*[SerializeField]
     protected Color ActiveColor; // (0f, 0.7882353f, 0.0902f) bright green
@@ -24,6 +24,7 @@ namespace LogicGateSimulator.PartBehaviors
         public event Action<PartBehavior> SelectChanged;
         private Part _partObject;
         [SerializeField] private SpriteRenderer _spriteRenderer;
+        [SerializeField] private SpriteRenderer _selectionRenderer;
         
         public Part PartObject
         {
@@ -45,7 +46,11 @@ namespace LogicGateSimulator.PartBehaviors
         public SpriteRenderer SpriteRenderer
         {
             get => _spriteRenderer;
-            set => _spriteRenderer = value;
+        }
+
+        public SpriteRenderer SelectionSpriteRenderer
+        {
+            get => _selectionRenderer;
         }
 
         public bool Selected
@@ -53,8 +58,9 @@ namespace LogicGateSimulator.PartBehaviors
             get => this._isSelected;
             set
             {
-                if (this._isSelected != value) SelectChanged?.Invoke(this);
+                if (this._isSelected == value) return;
                 this._isSelected = value;
+                SelectChanged?.Invoke(this);
             }
         }
 
@@ -77,15 +83,10 @@ namespace LogicGateSimulator.PartBehaviors
             
         }
 
-        void OnMouseDown()
-        {
-
-        }
-
         public virtual void UpdateColor()
         {
-            SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
-            if (this._isSelected) SpriteRenderer.color = this.SelectedColor;
+            if (_spriteRenderer != null) SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
+            SelectionSpriteRenderer.enabled = this.Selected;
         }
 
         public SimulationManager GetSim()
@@ -93,7 +94,8 @@ namespace LogicGateSimulator.PartBehaviors
             return SimulationManager.Sim();
         }
 
-        public void OnPointerDown(PointerEventData eventData)
+        //public void OnPointerDown(PointerEventData eventData)
+        public void OnMouseDown()
         {
             Debug.Log("Clicked " + this);
             if (Input.GetKey(KeyCode.LeftControl) && PartObject.Active)

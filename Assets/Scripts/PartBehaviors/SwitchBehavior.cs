@@ -7,19 +7,15 @@ namespace LogicGateSimulator.PartBehaviors
     public class SwitchBehavior : PartBehavior
     {
         [SerializeField] private Transform _toggle;
-        private float _currentY;
-        private float _targetY;
+        
         private const float Offset = 0.015f;
         private const float TargetTolerance = 0.002f;
         private const float ToggleSpeed = 0.14f;
+        private float _targetY = -Offset;
+        private float _currentY = -Offset;
+
         public override Type PartType => typeof(Switch);
-
-        private void Awake()
-        {
-            _targetY = -Offset;
-            _currentY = _targetY;
-        }
-
+        
         private void Update()
         {
             _toggle.localPosition = Vector3.up * _currentY; // new Vector3(0, currentY, 0); 
