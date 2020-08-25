@@ -34,7 +34,7 @@ namespace LogicGateSimulator.Parts
 
         public override string ToString()
         {
-            return $"Type: {this.GetType()}; Id: {this.Id}";
+            return $"Type: {this.GetType().Name}; Id: {this.Id}; Coords: {this.Coordinates}";
         }
     }
 }

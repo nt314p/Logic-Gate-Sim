@@ -142,11 +142,23 @@ namespace LogicGateSimulator
             var partType = instantiatedPartBehavior.PartType;
             instantiatedPartBehavior.PartObject = Activator.CreateInstance(partType) as Part;
             _currentCircuit.AddPart(instantiatedPartBehavior.PartObject);
+            instantiatedPartBehavior.SelectChanged += UpdateSelectedPart;
         }
 
-        public string GetSelectedPart()
+        private void UpdateSelectedPart(PartBehavior partBehavior)
         {
-            return _selectedPart;
+            if (partBehavior.Selected)
+            {
+                if (_selectedParts.Contains(partBehavior)) return;
+                _selectedParts.Add(partBehavior);
+            }
+            else
+                _selectedParts.Remove(partBehavior);
+        }
+
+        public List<PartBehavior> GetSelectedParts()
+        {
+            return _selectedParts;
         }
 
         public Circuit GetCircuit()
