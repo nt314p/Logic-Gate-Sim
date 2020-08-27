@@ -204,8 +204,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e547cb373dc2f6a41ac8f7e25ffeb8f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 6005799437256952154}
-  _selectionRenderer: {fileID: 2795832741040645072}
+  spriteRenderer: {fileID: 0}
+  selectionRenderer: {fileID: 2795832741040645072}
 --- !u!1001 &9094336873869195742
 PrefabInstance:
   m_ObjectHideFlags: 0

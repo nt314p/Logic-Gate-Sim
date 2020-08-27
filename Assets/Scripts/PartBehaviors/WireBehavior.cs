@@ -6,21 +6,32 @@ namespace LogicGateSimulator.PartBehaviors
 {
 	public class WireBehavior : PartBehavior
 	{
-		private const float WireLen = 1.38f;
+		private const float WireLen = 1.3888f;
 		public override Type PartType => typeof(Wire);
 
-		private void Awake()
+		private void Start()
 		{
 			if (PartObject == null) return;
+			SetupWire();
+		}
+
+		private void SetupWire()
+		{
 			Vector3 direction = (Vector2) ((Wire) PartObject).Orientation;
 			var wireTransform = this.transform;
 			wireTransform.localScale = new Vector3(WireLen, WireLen, 1) + direction * (9 * WireLen);
 			wireTransform.position = new Vector3(PartObject.Coordinates.x, PartObject.Coordinates.y, -0.01f) + direction * 0.5f;
+			UpdateColor();
 		}
 
 		public override void OnPartObjectChanged()
 		{
-			Awake();
+			SetupWire();
+		}
+
+		private void Update()
+		{
+			SetupWire();
 		}
 
 		private void OnMouseUp()
@@ -38,7 +49,7 @@ namespace LogicGateSimulator.PartBehaviors
 			}
 			else
 			{
-				SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
+				if (PartObject != null) SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
 			}
 		}
 	}

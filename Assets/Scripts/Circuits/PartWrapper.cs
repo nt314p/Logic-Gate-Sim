@@ -20,14 +20,14 @@ namespace LogicGateSimulator.Circuits
                 { Vector2Int.right, right }
             };
             this.Node = node;
-            this.Connected = false;
+            this.Connected = true;
         }
 
         public PartWrapper()
         {
             _wires = new Dictionary<Vector2Int, Wire> { { Vector2Int.up, null }, { Vector2Int.right, null } };
             this.Node = null;
-            this.Connected = false;
+            this.Connected = true;
         }
 
         public Wire GetWire(Vector2Int direction)

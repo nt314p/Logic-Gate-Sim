@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using LogicGateSimulator.Parts;
+using UnityEngine;
 
 namespace LogicGateSimulator.Circuits
 {
@@ -24,9 +25,9 @@ namespace LogicGateSimulator.Circuits
             _partGrid = new PartGrid(gridWidth, gridHeight);
         }
 
-        public void AddWires(List<Wire> wires)
+        public void AddWires(List<Wire> wires, List<Vector2Int> wirePathCoordinates)
         {
-            _partGrid.AddWires(wires);
+            _partGrid.AddWires(wires, wirePathCoordinates);
         }
 
         public void AddPart(Part part)

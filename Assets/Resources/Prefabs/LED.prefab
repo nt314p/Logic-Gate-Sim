@@ -178,8 +178,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f61dedbbe6a50ca42aa96dc53bc47833, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 527445061971236128}
-  _selectionRenderer: {fileID: 531798324183814791}
+  spriteRenderer: {fileID: 0}
+  selectionRenderer: {fileID: 531798324183814791}
 --- !u!58 &619199756143288076
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ namespace LogicGateSimulator
     {
         private const float ZoomScale = 0.5f;
         private const float InitialZoom = 10;
-        private const float MinZoom = 1.2f;
+        private const float MinZoom = 0.8f;
         private const float MaxZoom = 15;
         private const float DragSpeed = 2;
         private float _zoom;

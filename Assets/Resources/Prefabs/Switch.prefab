@@ -206,8 +206,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2fe82b796c9d884c96ad715b87dfc9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _spriteRenderer: {fileID: 0}
-  _selectionRenderer: {fileID: 4460209221803328527}
+  spriteRenderer: {fileID: 0}
+  selectionRenderer: {fileID: 4460209221803328527}
   _toggle: {fileID: 3563653745484309845}
 --- !u!1 &3563653744391754588
 GameObject:

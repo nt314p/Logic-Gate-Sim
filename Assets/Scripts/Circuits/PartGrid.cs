@@ -111,14 +111,7 @@ namespace LogicGateSimulator.Circuits
 
         public void AddPart(Part part)
         {
-            if (part is Wire wire)
-            {
-                AddWires(new List<Wire> { wire });
-            }
-            else
-            {
-                AddNode(part);
-            }
+            if (!(part is Wire)) AddNode(part);
         }
 
         private void AddNode(Part part)
@@ -137,9 +130,10 @@ namespace LogicGateSimulator.Circuits
             }
             wrapper.Node = part;
             wrapper.Connected = true; // a node will always connect
+            AddPartToDictionary(part);
         }
 
-        public void AddWires(List<Wire> wires) // wires should be passed in with id -1, also should be in order
+        public void AddWires(List<Wire> wires, List<Vector2Int> wirePathCoordinates)
         {
             foreach (var wire in wires)
             {
@@ -147,22 +141,29 @@ namespace LogicGateSimulator.Circuits
                 UpdateConnection(wire);
             }
 
-            var firstWire = wires[0];
-            var previousCoordinates = firstWire.Coordinates;
+            var previousCoordinates = wirePathCoordinates[0];
+            var nextCoordinates = wirePathCoordinates[1];
             var connectedIds = new HashSet<int>(); // using a set for unique ids only
 
             // adding the first wire's opposite direction since the for loop traversal moves in forward direction only
-            var firstWireConnections =
-                GetWiresFromDirection(firstWire.EndPoint, firstWire.Coordinates - firstWire.EndPoint);
-            firstWireConnections.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+            // var firstWireConnections =
+            //     GetWiresFromDirection(firstWire.EndPoint, firstWire.Coordinates - firstWire.EndPoint);
+            // firstWireConnections.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+            // var firstNode = GetWrapper(firstWire.Coordinates).Node;
+            // if (firstNode != null && firstNode.Id != -1) connectedIds.Add(firstNode.Id);
 
-            for (var index = 1; index < wires.Count; index++)
+            connectedIds.UnionWith(GetSurroundingPartIds(previousCoordinates, nextCoordinates));
+            
+            for (var index = 1; index < wirePathCoordinates.Count; index++)
             {
-                var currentCoordinates = wires[index].Coordinates;
-                if (Math.Abs((currentCoordinates - previousCoordinates).magnitude - 1) > 0.001f)
-                    currentCoordinates = wires[index].EndPoint;
-                var surroundingWires = GetWiresFromDirection(previousCoordinates, currentCoordinates - previousCoordinates);
-                surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+                var currentCoordinates = wirePathCoordinates[index];
+                // if (Math.Abs((currentCoordinates - previousCoordinates).magnitude - 1) > 0.001f)
+                //     currentCoordinates = wires[index].EndPoint;
+                
+                // var surroundingWires = GetWiresFromDirection(previousCoordinates, currentCoordinates - previousCoordinates);
+                // surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+                
+                connectedIds.UnionWith(GetSurroundingPartIds(currentCoordinates, previousCoordinates));
                 previousCoordinates = currentCoordinates;
             }
 
@@ -173,6 +174,17 @@ namespace LogicGateSimulator.Circuits
                 wire.Id = wireId;
                 AddPartToDictionary(wire);
             }
+        }
+
+        private HashSet<int> GetSurroundingPartIds(Vector2Int targetCoordinates, Vector2Int endCoordinates)
+        {
+            var connectedIds = new HashSet<int>();
+            var surroundingWires =
+                GetWiresFromDirection(targetCoordinates, endCoordinates - targetCoordinates);
+            surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
+            var node = GetWrapper(targetCoordinates).Node;
+            if (node != null && node.Id != -1) connectedIds.Add(node.Id);
+            return connectedIds;
         }
 
         private void AddPartToDictionary(Part part)
@@ -223,7 +235,7 @@ namespace LogicGateSimulator.Circuits
                     break;
             }
         }
-
+        
         private List<Wire> GetWiresFromDirection(Vector2Int coordinates, Vector2Int direction, bool ignoreConnected = false)
         {
             var wires = new List<Wire>();
@@ -248,10 +260,10 @@ namespace LogicGateSimulator.Circuits
 
         private List<Part> GetPartsOfId(int id) => _partDictionary[id];
 
-        public void SetPartsOfId(int id, bool state, bool hardSet = false)
+        public void SetPartsOfId(int id, bool state, bool ignoreActive = false)
         {
             var editParts = GetPartsOfId(id);
-            if (!hardSet) editParts = editParts.Where(p => !p.Active).ToList(); // soft set filters out active parts
+            if (ignoreActive) editParts = editParts.Where(p => !p.Active).ToList(); // soft set filters out active parts
             editParts.ForEach(p => p.State = state);
         }
 

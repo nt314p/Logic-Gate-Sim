@@ -117,7 +117,9 @@ namespace LogicGateSimulator
                                 var end = _wirePath[_wirePath.Count - 1];
                                 var wireBehavior = Instantiate(WirePrefabBehavior, ToVector3(start),
                                     Quaternion.identity);
+                                wireBehavior.enabled = true;
                                 wireBehavior.PartObject = new Wire(start, end);
+                                wireBehavior.SelectChanged += UpdateSelectedPart;
                                 _wiresInPath.Add(wireBehavior);
                             }
                         }
@@ -126,12 +128,15 @@ namespace LogicGateSimulator
             }
 
             if (!Input.GetMouseButtonUp(0)) return;
-            
+
             if (_wiresInPath.Count > 0)
-                _currentCircuit.AddWires(_wiresInPath.Select(w => (Wire)w.PartObject).ToList());
+            {
+                var wiresList = _wiresInPath.Select(w => (Wire) w.PartObject).ToList();
+                _currentCircuit.AddWires(wiresList, _wirePath);
+            }
             
-            _wiresInPath.Clear(); // resetting variables
-            _wirePath = new List<Vector2Int>();
+            _wiresInPath.Clear();
+            _wirePath.Clear();
             DrawingWirePath = false;
         }
 
@@ -141,7 +146,9 @@ namespace LogicGateSimulator
             var instantiatedPartBehavior = Instantiate(partBehavior, ToVector3(coordinates), Quaternion.identity);
             var partType = instantiatedPartBehavior.PartType;
             instantiatedPartBehavior.PartObject = Activator.CreateInstance(partType) as Part;
-            _currentCircuit.AddPart(instantiatedPartBehavior.PartObject);
+            var instantiatedPart = instantiatedPartBehavior.PartObject;
+            instantiatedPart.Coordinates = coordinates;
+            _currentCircuit.AddPart(instantiatedPart);
             instantiatedPartBehavior.SelectChanged += UpdateSelectedPart;
         }
 
