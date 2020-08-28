@@ -135,10 +135,11 @@ namespace LogicGateSimulator.Circuits
 
         public void AddWires(List<Wire> wires, List<Vector2Int> wirePathCoordinates)
         {
-            foreach (var wire in wires)
+            for (var index = 0; index < wires.Count; index++)
             {
+                var wire = wires[index];
                 GetWrapper(wire.Coordinates).SetWire(wire); // adding part to the grid
-                UpdateConnection(wire);
+                UpdateConnection(wirePathCoordinates[index], wirePathCoordinates[index + 1]);
             }
 
             var previousCoordinates = wirePathCoordinates[0];
@@ -204,10 +205,9 @@ namespace LogicGateSimulator.Circuits
         }
 
 
-        private void UpdateConnection(Wire addedWire)
+        private void UpdateConnection(Vector2Int coordinates, Vector2Int nextCoordinates)
         {
             var wireCount = 0;
-            var coordinates = addedWire.Coordinates;
             var direction = Vector2Int.right;
             for (var i = 0; i < 4; i++)
             {
@@ -220,14 +220,14 @@ namespace LogicGateSimulator.Circuits
                 case 0:
                 case 1:
                 case 2:
-                    GetWrapper(coordinates).Connected = false;
+                    GetWrapper(coordinates).Connected = true;
                     break;
                 case 3:
                     GetWrapper(coordinates).Connected = true;
                     break;
                 case 4:
                     // if the node was connected and the opposing wire to the wire being added is not unregistered
-                    if (IsConnected(coordinates) && GetWire(coordinates, -addedWire.Orientation).Id != -1)
+                    if (IsConnected(coordinates) && GetWire(coordinates, coordinates - nextCoordinates).Id != -1)
                     {
                         break; // do nothing because the node should keep it's connection
                     }
