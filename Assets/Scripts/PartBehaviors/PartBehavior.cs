@@ -16,6 +16,8 @@ namespace LogicGateSimulator.PartBehaviors
 
         private bool _isSelected;
         public event Action<PartBehavior> SelectChanged;
+        public event Action<bool, PartBehavior> MouseHover;
+        
         private Part _partObject;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private SpriteRenderer selectionRenderer;
@@ -33,9 +35,7 @@ namespace LogicGateSimulator.PartBehaviors
         }
 
         public abstract Type PartType { get; }
-
         public SpriteRenderer SpriteRenderer => spriteRenderer;
-
         public SpriteRenderer SelectionSpriteRenderer => selectionRenderer;
 
         public bool Selected
@@ -54,6 +54,10 @@ namespace LogicGateSimulator.PartBehaviors
             SelectChanged += OnSelectChanged;
             UpdateColor();
         }
+
+        private void OnMouseEnter() => MouseHover?.Invoke(true, this);
+        
+        private void OnMouseExit() => MouseHover?.Invoke(false, this);
 
         public virtual void OnStateChanged(Part part)
         {

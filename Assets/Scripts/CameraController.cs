@@ -11,11 +11,11 @@ namespace LogicGateSimulator
         private const float DragSpeed = 2;
         private float _zoom;
         private Vector3 _dragOrigin, _oldPosition;
-        [SerializeField] private Camera _mainCamera;
+        [SerializeField] private Camera mainCamera;
 
         private void Start()
         {
-            _mainCamera.orthographicSize = InitialZoom;
+            mainCamera.orthographicSize = InitialZoom;
             _zoom = InitialZoom;
         }
 
@@ -30,7 +30,7 @@ namespace LogicGateSimulator
 
             if (Input.GetMouseButton(1))
             {
-                var position = _mainCamera.ScreenToViewportPoint(Input.mousePosition - _dragOrigin);
+                var position = mainCamera.ScreenToViewportPoint(Input.mousePosition - _dragOrigin);
                 transform.position = _oldPosition - position * (_zoom * DragSpeed);
             }
 
@@ -38,14 +38,14 @@ namespace LogicGateSimulator
         
             if (scrollInput < 0 && _zoom < MaxZoom)
             {
-                ZoomCamera(_mainCamera.ScreenToWorldPoint(Input.mousePosition), -ZoomScale);
+                ZoomCamera(mainCamera.ScreenToWorldPoint(Input.mousePosition), -ZoomScale);
             }
             if (scrollInput > 0 && _zoom > MinZoom)
             {
-                ZoomCamera(_mainCamera.ScreenToWorldPoint(Input.mousePosition), ZoomScale);
+                ZoomCamera(mainCamera.ScreenToWorldPoint(Input.mousePosition), ZoomScale);
             }
         
-            _mainCamera.orthographicSize = _zoom;
+            mainCamera.orthographicSize = _zoom;
         }
 
         public float GetZoom()

@@ -11,6 +11,7 @@ namespace LogicGateSimulator
     public class SimulationManager : MonoBehaviour
     {
         private static SimulationManager _instance = null;
+        public DebugCanvasController DebugCanvasController;
         public WireBehavior WirePrefabBehavior;
         public LedBehavior LedPrefabBehavior;
         public SwitchBehavior SwitchPrefabBehavior;
@@ -24,10 +25,11 @@ namespace LogicGateSimulator
         [SerializeField] private Camera _mainCamera;
 
         public Dictionary<KeyCode, string> Keybinds = new Dictionary<KeyCode, string>
-        { { KeyCode.W, "Wire" },
-            { KeyCode.L, "led" },
-            { KeyCode.S, "switch" },
-            { KeyCode.B, "button" }
+        {
+            {KeyCode.W, "Wire"},
+            {KeyCode.L, "led"},
+            {KeyCode.S, "switch"},
+            {KeyCode.B, "button"}
         };
 
         // Start is called before the first frame update
@@ -55,6 +57,7 @@ namespace LogicGateSimulator
                 _selectedPart = entry.Value;
                 pressed = true;
             }
+
             if (!pressed)
             {
                 _selectedPart = "";
@@ -75,6 +78,7 @@ namespace LogicGateSimulator
                             _wirePath.Add(mouseCoordinates);
                             DrawingWirePath = true;
                         }
+
                         break;
                     case "led":
                         AddPart(LedPrefabBehavior, mouseCoordinates);
@@ -88,7 +92,6 @@ namespace LogicGateSimulator
                     default:
                         break;
                 }
-
             }
             else if (Input.GetMouseButton(0))
             {
@@ -119,7 +122,7 @@ namespace LogicGateSimulator
                                     Quaternion.identity);
                                 wireBehavior.enabled = true;
                                 wireBehavior.PartObject = new Wire(start, end);
-                                wireBehavior.SelectChanged += UpdateSelectedPart;
+                                SubscribeToPartBehaviorEvents(wireBehavior);
                                 _wiresInPath.Add(wireBehavior);
                             }
                         }
@@ -134,7 +137,7 @@ namespace LogicGateSimulator
                 var wiresList = _wiresInPath.Select(w => (Wire) w.PartObject).ToList();
                 _currentCircuit.AddWires(wiresList, _wirePath);
             }
-            
+
             _wiresInPath.Clear();
             _wirePath.Clear();
             DrawingWirePath = false;
@@ -149,7 +152,13 @@ namespace LogicGateSimulator
             var instantiatedPart = instantiatedPartBehavior.PartObject;
             instantiatedPart.Coordinates = coordinates;
             _currentCircuit.AddPart(instantiatedPart);
-            instantiatedPartBehavior.SelectChanged += UpdateSelectedPart;
+            SubscribeToPartBehaviorEvents(instantiatedPartBehavior);
+        }
+
+        private void SubscribeToPartBehaviorEvents(PartBehavior partBehavior)
+        {
+            partBehavior.SelectChanged += UpdateSelectedPart;
+            partBehavior.MouseHover += DebugCanvasController.UpdatePartBehaviorHover;
         }
 
         private void UpdateSelectedPart(PartBehavior partBehavior)
@@ -183,6 +192,7 @@ namespace LogicGateSimulator
             {
                 _selectedParts.Add(p);
             }
+
             return !_selectedParts.Contains(p);
         }
 
@@ -219,7 +229,8 @@ namespace LogicGateSimulator
             var signY = Mathf.RoundToInt(Mathf.Sign((end.y - start.y))); // go in (up down left right)
 
             for (var i = 0; i < steps; i++)
-            { // stepping and incrementing
+            {
+                // stepping and incrementing
                 var last = ret[ret.Count - 1];
                 var vStep = new Vector2Int(last.x, last.y + signY); // computing both possible steps
                 var hStep = new Vector2Int(last.x + signX, last.y);
@@ -232,6 +243,7 @@ namespace LogicGateSimulator
                 // add the step that will bring us closer to the target angle
                 ret.Add(Mathf.Abs(vAngle - targetAngle) < Mathf.Abs(hAngle - targetAngle) ? vStep : hStep);
             }
+
             ret.RemoveAt(0); // removing starting coordinate
             return ret;
         }
@@ -239,7 +251,8 @@ namespace LogicGateSimulator
         private Vector2Int ClampedVectorInBounds(Vector2Int vector)
         {
             var clamped = new Vector2Int(vector.x, vector.y);
-            clamped.Clamp(Vector2Int.zero, new Vector2Int(_currentCircuit.GridWidth - 1, _currentCircuit.GridHeight - 1));
+            clamped.Clamp(Vector2Int.zero,
+                new Vector2Int(_currentCircuit.GridWidth - 1, _currentCircuit.GridHeight - 1));
             return clamped;
         }
 
@@ -252,6 +265,5 @@ namespace LogicGateSimulator
         {
             return _instance;
         }
-
     }
 }

@@ -124,9 +124,13 @@ namespace LogicGateSimulator.Circuits
                 var newId = LinkIds(wrapper.GetWires().Select(wire => wire.Id).ToList());
                 part.Id = newId;
             }
-            else
+            else if(surroundingWires.Count == 0)
             {
                 part.Id = GetNextAvailableId();
+            }
+            else
+            {
+                part.Id = surroundingWires[0].Id;
             }
             wrapper.Node = part;
             wrapper.Connected = true; // a node will always connect

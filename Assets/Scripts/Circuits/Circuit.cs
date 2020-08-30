@@ -17,6 +17,11 @@ namespace LogicGateSimulator.Circuits
         {
             get;
         }
+
+        private void PartStateChanged(Part part)
+        {
+            
+        }
         
         public Circuit(int gridWidth, int gridHeight)
         {
@@ -27,6 +32,7 @@ namespace LogicGateSimulator.Circuits
 
         public void AddWires(List<Wire> wires, List<Vector2Int> wirePathCoordinates)
         {
+            wires.ForEach(wire => wire.StateChanged += PartStateChanged);
             _partGrid.AddWires(wires, wirePathCoordinates);
         }
 
