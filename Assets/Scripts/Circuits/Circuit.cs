@@ -20,7 +20,8 @@ namespace LogicGateSimulator.Circuits
 
         private void PartStateChanged(Part part)
         {
-            
+            if (!part.Active) return;
+            _partGrid.SetPartsOfId(part.Id, part.State);
         }
         
         public Circuit(int gridWidth, int gridHeight)
@@ -38,6 +39,7 @@ namespace LogicGateSimulator.Circuits
 
         public void AddPart(Part part)
         {
+            part.StateChanged += PartStateChanged;
             _partGrid.AddPart(part);
         }
     }

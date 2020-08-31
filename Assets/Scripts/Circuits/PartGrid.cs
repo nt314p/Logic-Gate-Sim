@@ -64,18 +64,7 @@ namespace LogicGateSimulator.Circuits
                 if (!p.Active || state) break; // end of active parts or state = true
                 state |= p.State;
             }
-            SetAllOfId(id, state);
-        }
-
-        // hard set sets all components, soft set will ignore active components
-        private void SetAllOfId(int id, bool state, bool hardSet = false)
-        {
-            var editParts = GetAllOfId(id);
-            if (!hardSet) // soft set filters out active parts
-            { 
-                editParts = editParts.Where(p => !p.Active).ToList();
-            }
-            editParts.ForEach(p => p.State = state);
+            SetPartsOfId(id, state);
         }
 
         private List<Part> GetAllOfId(int id)
@@ -207,24 +196,20 @@ namespace LogicGateSimulator.Circuits
                 partsOfId.Add(part);
 
         }
-
-
+        
         private void UpdateConnection(Vector2Int coordinates, Vector2Int nextCoordinates)
         {
-            var wireCount = 0;
-            var direction = Vector2Int.right;
-            for (var i = 0; i < 4; i++)
-            {
-                direction = new Vector2Int(-direction.y, direction.x);
-                if (GetWire(coordinates, direction) != null) wireCount++;
-            }
+            var wires = GetWiresAtCoordinates(coordinates).Where(wire => wire != null).ToList();
+            var wireCount = wires.Count;
             // Special case: three wires -> four wires remain connected (unless the wire opposite to the wire being added is also unregistered)
             switch (wireCount)
             {
                 case 0:
                 case 1:
+                    GetWrapper(coordinates).Connected = false;
+                    break;
                 case 2:
-                    GetWrapper(coordinates).Connected = true;
+                    GetWrapper(coordinates).Connected = wires[0].Orientation != wires[1].Orientation; // connect wires when at a corner
                     break;
                 case 3:
                     GetWrapper(coordinates).Connected = true;

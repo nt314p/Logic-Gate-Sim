@@ -64,18 +64,19 @@ namespace LogicGateSimulator.PartBehaviors
             UpdateColor();
         }
 
-        public virtual void OnSelectChanged(PartBehavior partBehavior)
+        protected virtual void OnSelectChanged(PartBehavior partBehavior)
         {
             UpdateColor();
         }
 
-        public virtual void OnPartObjectChanged()
+        protected virtual void OnPartObjectChanged()
         {
+            UpdateColor();
         }
 
-        public virtual void UpdateColor()
+        protected virtual void UpdateColor()
         {
-            if (spriteRenderer != null) SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
+            if (spriteRenderer != null && PartObject != null) SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
             SelectionSpriteRenderer.enabled = this.Selected;
         }
 
@@ -87,11 +88,9 @@ namespace LogicGateSimulator.PartBehaviors
         //public void OnPointerDown(PointerEventData eventData)
         public void OnMouseDown()
         {
-            Debug.Log("Clicked " + this.PartObject);
-            if (Input.GetKey(KeyCode.LeftControl) && PartObject.Active)
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && PartObject.Active)
             {
                 PartObject.State = !PartObject.State;
-                // GetSim().GetCircuit().CalculateStateId(PartObject.Id);
             }
             else
             {

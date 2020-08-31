@@ -23,11 +23,12 @@ namespace LogicGateSimulator.Parts
             get => this._state;
             set
             {
-                if (this._state != value) StateChanged?.Invoke(this);
+                if (this._state == value) return;
                 this._state = value;
+                StateChanged?.Invoke(this);
             }
         }
-        
+
         public Vector2Int Coordinates { get; set; }
 
         public bool Active { get; }

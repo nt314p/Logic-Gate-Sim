@@ -7,7 +7,6 @@ namespace LogicGateSimulator.PartBehaviors
     public class SwitchBehavior : PartBehavior
     {
         [SerializeField] private Transform _toggle;
-        
         private const float Offset = 0.015f;
         private const float TargetTolerance = 0.002f;
         private const float ToggleSpeed = 0.14f;

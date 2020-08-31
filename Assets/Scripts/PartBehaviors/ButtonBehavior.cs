@@ -1,5 +1,6 @@
 ﻿using System;
 using LogicGateSimulator.Parts;
+using UnityEngine;
 
 namespace LogicGateSimulator.PartBehaviors
 {
@@ -9,6 +10,8 @@ namespace LogicGateSimulator.PartBehaviors
 
         private void OnMouseUpAsButton()
         {
+            PartObject.State = false;
+
             // PartObject.State = false; // untoggle button
             //GetSim().GetCircuit().CalculateStateId(PartObject.Id); // fix this sketchy code
             // perhaps add a "updated" boolean that is set if the state has been updated

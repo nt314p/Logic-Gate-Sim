@@ -24,7 +24,7 @@ namespace LogicGateSimulator.PartBehaviors
 			UpdateColor();
 		}
 
-		public override void OnPartObjectChanged()
+		protected override void OnPartObjectChanged()
 		{
 			SetupWire();
 		}
@@ -40,7 +40,7 @@ namespace LogicGateSimulator.PartBehaviors
 			SpriteRenderer.sortingOrder = 0;
 		}
 
-		public override void UpdateColor()
+		protected override void UpdateColor()
 		{
 			if (this.Selected)
 			{
