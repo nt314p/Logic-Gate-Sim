@@ -135,28 +135,18 @@ namespace LogicGateSimulator.Circuits
                 UpdateConnection(wirePathCoordinates[index], wirePathCoordinates[index + 1]);
             }
 
+            var pathCount = wirePathCoordinates.Count;
+            UpdateConnection(wirePathCoordinates[pathCount - 1], wirePathCoordinates[pathCount - 2]);
+
             var previousCoordinates = wirePathCoordinates[0];
             var nextCoordinates = wirePathCoordinates[1];
             var connectedIds = new HashSet<int>(); // using a set for unique ids only
-
-            // adding the first wire's opposite direction since the for loop traversal moves in forward direction only
-            // var firstWireConnections =
-            //     GetWiresFromDirection(firstWire.EndPoint, firstWire.Coordinates - firstWire.EndPoint);
-            // firstWireConnections.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
-            // var firstNode = GetWrapper(firstWire.Coordinates).Node;
-            // if (firstNode != null && firstNode.Id != -1) connectedIds.Add(firstNode.Id);
-
+            
             connectedIds.UnionWith(GetSurroundingPartIds(previousCoordinates, nextCoordinates));
             
             for (var index = 1; index < wirePathCoordinates.Count; index++)
             {
                 var currentCoordinates = wirePathCoordinates[index];
-                // if (Math.Abs((currentCoordinates - previousCoordinates).magnitude - 1) > 0.001f)
-                //     currentCoordinates = wires[index].EndPoint;
-                
-                // var surroundingWires = GetWiresFromDirection(previousCoordinates, currentCoordinates - previousCoordinates);
-                // surroundingWires.ForEach(surroundingWire => connectedIds.Add(surroundingWire.Id));
-                
                 connectedIds.UnionWith(GetSurroundingPartIds(currentCoordinates, previousCoordinates));
                 previousCoordinates = currentCoordinates;
             }
