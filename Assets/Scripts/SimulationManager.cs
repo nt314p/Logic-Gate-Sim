@@ -105,7 +105,7 @@ namespace LogicGateSimulator
                         // is the Wire going back on itself
                         if (_wirePath.Count >= 2 && _wirePath[_wirePath.Count - 2] == mouseCoordinates)
                         {
-                            Destroy(_wiresInPath[_wiresInPath.Count - 1]); // removing Wire
+                            Destroy(_wiresInPath[_wiresInPath.Count - 1].gameObject);
                             _wirePath.RemoveAt(_wirePath.Count - 1);
                             _wiresInPath.RemoveAt(_wiresInPath.Count - 1);
                         }
@@ -143,7 +143,7 @@ namespace LogicGateSimulator
             DrawingWirePath = false;
         }
 
-        public void AddPart(PartBehavior partBehavior, Vector2Int coordinates)
+        private void AddPart(PartBehavior partBehavior, Vector2Int coordinates)
         {
             if (partBehavior is WireBehavior) return;
             var instantiatedPartBehavior = Instantiate(partBehavior, ToVector3(coordinates), Quaternion.identity);

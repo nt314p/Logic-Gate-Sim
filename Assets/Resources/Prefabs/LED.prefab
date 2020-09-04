@@ -49,7 +49,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8b94512e081822743a2cdbca44579395, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -134,7 +134,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 8b94512e081822743a2cdbca44579395, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -180,6 +180,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   spriteRenderer: {fileID: 527445061971236128}
   selectionRenderer: {fileID: 531798324183814791}
+  previewMaterial: {fileID: 2100000, guid: 4d60692dc9951ef4eb3e2bbee0ec1e12, type: 2}
+  placedMaterial: {fileID: 2100000, guid: 8b94512e081822743a2cdbca44579395, type: 2}
 --- !u!58 &619199756143288076
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -283,6 +285,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6411252453355280910, guid: aa2864482c600cb4589c9e03dab3471e,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 8b94512e081822743a2cdbca44579395, type: 2}
     - target: {fileID: 6411252453355280911, guid: aa2864482c600cb4589c9e03dab3471e,
         type: 3}
       propertyPath: m_Name

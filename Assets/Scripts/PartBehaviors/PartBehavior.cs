@@ -14,13 +14,18 @@ namespace LogicGateSimulator.PartBehaviors
         protected readonly Color InactiveColor = new Color(0.04705883f, 0.454902f, 0.1137255f); // dark green
         protected readonly Color SelectedColor = new Color(0.4478532f, 0.8867924f, 0f); // another bright green
 
+        
         private bool _isSelected;
+        private bool _isPreview;
+        
         public event Action<PartBehavior> SelectChanged;
         public event Action<bool, PartBehavior> MouseHover;
         
         private Part _partObject;
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField] private SpriteRenderer selectionRenderer;
+        [SerializeField] private Material previewMaterial;
+        [SerializeField] private Material placedMaterial;
 
         public Part PartObject
         {
@@ -55,6 +60,11 @@ namespace LogicGateSimulator.PartBehaviors
             UpdateColor();
         }
 
+        private void Update()
+        {
+            
+        }
+
         private void OnMouseEnter() => MouseHover?.Invoke(true, this);
         
         private void OnMouseExit() => MouseHover?.Invoke(false, this);
@@ -76,7 +86,14 @@ namespace LogicGateSimulator.PartBehaviors
 
         protected virtual void UpdateColor()
         {
-            if (spriteRenderer != null && PartObject != null) SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
+            if (spriteRenderer != null)
+            {
+                if (PartObject != null)
+                {
+                    SpriteRenderer.color = PartObject.State ? this.ActiveColor : this.InactiveColor;
+                }
+            }
+
             SelectionSpriteRenderer.enabled = this.Selected;
         }
 

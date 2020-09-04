@@ -29,11 +29,6 @@ namespace LogicGateSimulator.PartBehaviors
 			SetupWire();
 		}
 
-		private void Update()
-		{
-			SetupWire();
-		}
-
 		private void OnMouseUp()
 		{
 			UpdateColor();

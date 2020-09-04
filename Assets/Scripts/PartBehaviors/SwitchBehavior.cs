@@ -15,7 +15,7 @@ namespace LogicGateSimulator.PartBehaviors
 
         public override Type PartType => typeof(Switch);
         
-        private void Update()
+        private void LateUpdate()
         {
             _toggle.localPosition = Vector3.up * _currentY; // new Vector3(0, currentY, 0); 
 
