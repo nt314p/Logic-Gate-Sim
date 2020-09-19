@@ -18,13 +18,6 @@ namespace LogicGateSimulator
 			_gridPlane.transform.localScale = new Vector3(Width, Height, 1);
 			_gridPlane.transform.position = new Vector3(Width / 2f - 0.5f, Height / 2f - 0.5f, 0);
 		}
-
-		private void OnMouseDown()
-		{
-			Debug.Log("Mouse down on plane!");
-			SimulationManager.Sim().ClearSelected();
-		}
-
 		public void SetWidth(int width)
 		{
 			GridController.Width = width;

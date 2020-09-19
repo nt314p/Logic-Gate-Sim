@@ -24,7 +24,7 @@ namespace LogicGateSimulator
         // Update is called once per frame
         private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (false && Input.GetMouseButtonDown(0))
             {
                 var hit = Physics2D.Raycast(mainCamera.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
                 var hitCollider = hit.collider;

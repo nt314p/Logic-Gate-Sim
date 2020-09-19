@@ -35,14 +35,13 @@ namespace LogicGateSimulator
         // Start is called before the first frame update
         private void Start()
         {
-            Application.targetFrameRate = 60;
+            Application.targetFrameRate = 120;
             _instance = this;
             _wirePath = new List<Vector2Int>();
             _wiresInPath = new List<WireBehavior>();
             DrawingWirePath = false;
             _selectedPart = "";
             _selectedParts = new List<PartBehavior>();
-
             _currentCircuit = new Circuit(GridController.Width, GridController.Height);
             //_currentCircuit.RecalculateIds();
         }
@@ -50,6 +49,7 @@ namespace LogicGateSimulator
         // Update is called once per frame
         private void Update()
         {
+            ProcessMouseInput();
             var pressed = false;
             foreach (var entry in Keybinds)
             {
@@ -143,6 +143,57 @@ namespace LogicGateSimulator
             DrawingWirePath = false;
         }
 
+        private void ProcessMouseInput()
+        {
+            var mouseDown = Input.GetMouseButtonDown(0);
+            if (mouseDown || Input.GetMouseButtonUp(0))
+            {
+                var colliders = Physics2D.OverlapPointAll(_mainCamera.ScreenToWorldPoint(Input.mousePosition));
+                if (colliders.Length == 0) return;
+                if (colliders.Length == 1)
+                {
+                    if(mouseDown) MouseDownBackground();
+                }
+                else
+                {
+                    PartBehavior lastPartBehavior = null;
+                    foreach (var partCollider in colliders)
+                    {
+                        if (partCollider.TryGetComponent(out PartBehavior partBehavior))
+                        {
+                            lastPartBehavior = partBehavior;
+                            if (!(lastPartBehavior is WireBehavior)) break;
+                        }
+                    }
+
+                    if (mouseDown)
+                        MouseDownPart(lastPartBehavior);
+                    else
+                        MouseUpPart(lastPartBehavior);
+                }
+                
+            }
+        }
+
+        private void MouseDownPart(PartBehavior partBehavior)
+        {
+            var partObject = partBehavior.PartObject;
+            if (partObject.Active && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            {
+                partObject.State = !partObject.State;
+            }
+        }
+
+        private void MouseUpPart(PartBehavior partBehavior)
+        {
+            SelectPart(partBehavior);
+        }
+
+        private void MouseDownBackground()
+        {
+            DeselectAllParts();
+        }
+
         private void AddPart(PartBehavior partBehavior, Vector2Int coordinates)
         {
             if (partBehavior is WireBehavior) return;
@@ -157,12 +208,13 @@ namespace LogicGateSimulator
 
         private void SubscribeToPartBehaviorEvents(PartBehavior partBehavior)
         {
-            partBehavior.SelectChanged += UpdateSelectedPart;
+            //partBehavior.SelectChanged += UpdateSelectedPart;
             partBehavior.MouseHover += DebugCanvasController.UpdatePartBehaviorHover;
         }
 
-        private void UpdateSelectedPart(PartBehavior partBehavior)
+        private void SelectPart(PartBehavior partBehavior)
         {
+            partBehavior.Selected = !partBehavior.Selected;
             if (partBehavior.Selected)
             {
                 if (_selectedParts.Contains(partBehavior)) return;
@@ -170,6 +222,15 @@ namespace LogicGateSimulator
             }
             else
                 _selectedParts.Remove(partBehavior);
+        }
+
+        private void DeselectAllParts()
+        {
+            foreach (var partBehavior in _selectedParts)
+            {
+                partBehavior.Selected = false;
+            }
+            _selectedParts.Clear();
         }
 
         public List<PartBehavior> GetSelectedParts()

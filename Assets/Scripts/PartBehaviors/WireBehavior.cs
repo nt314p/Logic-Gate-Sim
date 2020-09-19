@@ -20,7 +20,7 @@ namespace LogicGateSimulator.PartBehaviors
 			Vector3 direction = (Vector2) ((Wire) PartObject).Orientation;
 			var wireTransform = this.transform;
 			wireTransform.localScale = new Vector3(WireLen, WireLen, 1) + direction * (9 * WireLen);
-			wireTransform.position = new Vector3(PartObject.Coordinates.x, PartObject.Coordinates.y, -0.01f) + direction * 0.5f;
+			wireTransform.position = new Vector3(PartObject.Coordinates.x, PartObject.Coordinates.y, 0) + direction * 0.5f;
 			UpdateColor();
 		}
 

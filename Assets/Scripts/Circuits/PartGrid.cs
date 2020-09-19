@@ -239,7 +239,7 @@ namespace LogicGateSimulator.Circuits
 
         private List<Part> GetPartsOfId(int id) => _partDictionary[id];
 
-        public void SetPartsOfId(int id, bool state, bool ignoreActive = false)
+        public void SetPartsOfId(int id, bool state, bool ignoreActive = true)
         {
             var editParts = GetPartsOfId(id);
             if (ignoreActive) editParts = editParts.Where(p => !p.Active).ToList(); // soft set filters out active parts

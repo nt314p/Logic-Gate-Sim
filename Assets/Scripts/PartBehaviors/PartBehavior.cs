@@ -18,7 +18,7 @@ namespace LogicGateSimulator.PartBehaviors
         private bool _isSelected;
         private bool _isPreview;
         
-        public event Action<PartBehavior> SelectChanged;
+        //public event Action<PartBehavior> SelectChanged;
         public event Action<bool, PartBehavior> MouseHover;
         
         private Part _partObject;
@@ -48,15 +48,16 @@ namespace LogicGateSimulator.PartBehaviors
             get => this._isSelected;
             set
             {
-                if (this._isSelected == value) return;
+                // if (this._isSelected == value) return;
                 this._isSelected = value;
-                SelectChanged?.Invoke(this);
+                OnSelectChanged();
+                // SelectChanged?.Invoke(this);
             }
         }
 
         private void Awake()
         {
-            SelectChanged += OnSelectChanged;
+            //SelectChanged += OnSelectChanged;
             UpdateColor();
         }
 
@@ -74,7 +75,7 @@ namespace LogicGateSimulator.PartBehaviors
             UpdateColor();
         }
 
-        protected virtual void OnSelectChanged(PartBehavior partBehavior)
+        private void OnSelectChanged()
         {
             UpdateColor();
         }
@@ -103,16 +104,10 @@ namespace LogicGateSimulator.PartBehaviors
         }
 
         //public void OnPointerDown(PointerEventData eventData)
-        public void OnMouseDown()
+
+        public override string ToString()
         {
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && PartObject.Active)
-            {
-                PartObject.State = !PartObject.State;
-            }
-            else
-            {
-                this.Selected = !this.Selected; // toggle selected
-            }
+            return PartObject.ToString();
         }
     }
 }
