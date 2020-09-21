@@ -12,13 +12,13 @@ namespace LogicGateSimulator
         [SerializeField] private GameObject tooltipBackground;
         [SerializeField] private Transform tooltipTransform;
         [SerializeField] private SimulationManager simulationManager;
-        [SerializeField] private Camera mainCamera;
         private Vector3 _tooltipOffset;
 
         private void Awake()
         {
             var tooltipRect = tooltipBackground.GetComponent<RectTransform>().rect;
             _tooltipOffset = new Vector3(-tooltipRect.width/2, tooltipRect.height/2);
+            simulationManager.MouseHoverOverPart += UpdatePartBehaviorHover;
         }
 
         private void Update()
@@ -35,8 +35,9 @@ namespace LogicGateSimulator
             tooltipTransform.position = mouseCoordinates + _tooltipOffset;
         }
         
-        public void UpdatePartBehaviorHover(bool isHovering, PartBehavior partBehavior)
+        private void UpdatePartBehaviorHover(PartBehavior partBehavior)
         {
+            var isHovering = partBehavior != null;
             tooltipBackground.SetActive(isHovering);
             if (!isHovering)
             {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace LogicGateSimulator.PartBehaviors
 {
-    public abstract class PartBehavior : MonoBehaviour //, IPointerDownHandler
+    public abstract class PartBehavior : MonoBehaviour
     {
         // [SerializeField] protected Color ActiveColor; // (0f, 0.7882353f, 0.0902f) bright green
         // [SerializeField] protected Color InactiveColor; // (0.04705883f, 0.454902f, 0.1137255f) dark green
@@ -40,8 +40,8 @@ namespace LogicGateSimulator.PartBehaviors
         }
 
         public abstract Type PartType { get; }
-        public SpriteRenderer SpriteRenderer => spriteRenderer;
-        public SpriteRenderer SelectionSpriteRenderer => selectionRenderer;
+        protected SpriteRenderer SpriteRenderer => spriteRenderer;
+        protected SpriteRenderer SelectionSpriteRenderer => selectionRenderer;
 
         public bool Selected
         {
@@ -97,14 +97,7 @@ namespace LogicGateSimulator.PartBehaviors
 
             SelectionSpriteRenderer.enabled = this.Selected;
         }
-
-        public SimulationManager GetSim()
-        {
-            return SimulationManager.Sim();
-        }
-
-        //public void OnPointerDown(PointerEventData eventData)
-
+        
         public override string ToString()
         {
             return PartObject.ToString();

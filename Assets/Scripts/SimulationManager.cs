@@ -10,8 +10,7 @@ namespace LogicGateSimulator
 {
     public class SimulationManager : MonoBehaviour
     {
-        private static SimulationManager _instance = null;
-        public DebugCanvasController DebugCanvasController;
+        private const int MaxMouseInputColliders = 7;
         public WireBehavior WirePrefabBehavior;
         public LedBehavior LedPrefabBehavior;
         public SwitchBehavior SwitchPrefabBehavior;
@@ -21,9 +20,15 @@ namespace LogicGateSimulator
         public bool DrawingWirePath;
         private string _selectedPart;
         private Circuit _currentCircuit;
+        private Collider2D[] _mouseInputColliders;
+        private PartBehavior _hoveringPart;
         private List<PartBehavior> _selectedParts;
         [SerializeField] private Camera _mainCamera;
-
+        public Camera MainCamera => _mainCamera;
+        public event Action<PartBehavior> MouseDownOnPart;
+        public event Action<PartBehavior> MouseUpOnPart;
+        public event Action<PartBehavior> MouseHoverOverPart;
+        
         public Dictionary<KeyCode, string> Keybinds = new Dictionary<KeyCode, string>
         {
             {KeyCode.W, "Wire"},
@@ -36,13 +41,17 @@ namespace LogicGateSimulator
         private void Start()
         {
             Application.targetFrameRate = 120;
-            _instance = this;
             _wirePath = new List<Vector2Int>();
             _wiresInPath = new List<WireBehavior>();
             DrawingWirePath = false;
             _selectedPart = "";
             _selectedParts = new List<PartBehavior>();
             _currentCircuit = new Circuit(GridController.Width, GridController.Height);
+            _mouseInputColliders = new Collider2D[MaxMouseInputColliders];
+
+            MouseDownOnPart += OnMouseDownPart;
+            MouseUpOnPart += OnMouseUpPart;
+            MouseHoverOverPart += OnMouseHoverPart;
             //_currentCircuit.RecalculateIds();
         }
 
@@ -62,9 +71,7 @@ namespace LogicGateSimulator
             {
                 _selectedPart = "";
             }
-
-            // Debug.Log(selectedPart);
-
+            
             var temp = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
             var mouseCoordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
             mouseCoordinates = ClampedVectorInBounds(mouseCoordinates); // force clamp
@@ -88,8 +95,6 @@ namespace LogicGateSimulator
                         break;
                     case "button":
                         AddPart(ButtonPrefabBehavior, mouseCoordinates);
-                        break;
-                    default:
                         break;
                 }
             }
@@ -146,37 +151,40 @@ namespace LogicGateSimulator
         private void ProcessMouseInput()
         {
             var mouseDown = Input.GetMouseButtonDown(0);
-            if (mouseDown || Input.GetMouseButtonUp(0))
-            {
-                var colliders = Physics2D.OverlapPointAll(_mainCamera.ScreenToWorldPoint(Input.mousePosition));
-                if (colliders.Length == 0) return;
-                if (colliders.Length == 1)
-                {
-                    if(mouseDown) MouseDownBackground();
-                }
-                else
-                {
-                    PartBehavior lastPartBehavior = null;
-                    foreach (var partCollider in colliders)
-                    {
-                        if (partCollider.TryGetComponent(out PartBehavior partBehavior))
-                        {
-                            lastPartBehavior = partBehavior;
-                            if (!(lastPartBehavior is WireBehavior)) break;
-                        }
-                    }
+            
+            var size = Physics2D.OverlapPointNonAlloc(_mainCamera.ScreenToWorldPoint(Input.mousePosition), _mouseInputColliders);
+            if (_mouseInputColliders.Length == 0) return;
+            
+            PartBehavior lastPartBehavior = null;
 
-                    if (mouseDown)
-                        MouseDownPart(lastPartBehavior);
-                    else
-                        MouseUpPart(lastPartBehavior);
+            if (_mouseInputColliders.Length != 1) // parts, not plane
+            {
+                for(var index = 0; index < size; index++)
+                {
+                    if (!_mouseInputColliders[index].TryGetComponent(out PartBehavior partBehavior)) continue;
+                    lastPartBehavior = partBehavior;
+                    if (!(lastPartBehavior is WireBehavior)) break;
                 }
-                
+            }
+            
+            if (mouseDown)
+                MouseDownOnPart?.Invoke(lastPartBehavior);
+            else if(Input.GetMouseButtonUp(0))
+                MouseUpOnPart?.Invoke(lastPartBehavior);
+            else if (_hoveringPart != lastPartBehavior)
+            {
+                _hoveringPart = lastPartBehavior;
+                MouseHoverOverPart?.Invoke(lastPartBehavior);
             }
         }
 
-        private void MouseDownPart(PartBehavior partBehavior)
+        private void OnMouseDownPart(PartBehavior partBehavior)
         {
+            if (partBehavior == null)
+            {
+                DeselectAllParts();
+                return;
+            }
             var partObject = partBehavior.PartObject;
             if (partObject.Active && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
             {
@@ -184,14 +192,14 @@ namespace LogicGateSimulator
             }
         }
 
-        private void MouseUpPart(PartBehavior partBehavior)
+        private void OnMouseUpPart(PartBehavior partBehavior)
         {
-            SelectPart(partBehavior);
+            if (partBehavior != null && _selectedPart == "") SelectPart(partBehavior);
         }
 
-        private void MouseDownBackground()
+        private void OnMouseHoverPart(PartBehavior partBehavior)
         {
-            DeselectAllParts();
+            // Debug.Log("Hovering over: " + partBehavior);
         }
 
         private void AddPart(PartBehavior partBehavior, Vector2Int coordinates)
@@ -209,7 +217,7 @@ namespace LogicGateSimulator
         private void SubscribeToPartBehaviorEvents(PartBehavior partBehavior)
         {
             //partBehavior.SelectChanged += UpdateSelectedPart;
-            partBehavior.MouseHover += DebugCanvasController.UpdatePartBehaviorHover;
+            //partBehavior.MouseHover += DebugCanvasController.UpdatePartBehaviorHover;
         }
 
         private void SelectPart(PartBehavior partBehavior)
@@ -256,15 +264,7 @@ namespace LogicGateSimulator
 
             return !_selectedParts.Contains(p);
         }
-
-        public void ClearSelected()
-        {
-            while (_selectedParts.Count != 0)
-            {
-                _selectedParts[0].Selected = false;
-            }
-        }
-
+        
         private static Vector3 ToVector3(Vector2Int vector2)
         {
             return new Vector3(vector2.x, vector2.y, 0);
@@ -281,7 +281,7 @@ namespace LogicGateSimulator
         // Interpolate method determines the horizontal and vertical steps to model a diagonal line
         private static List<Vector2Int> Interpolate(Vector2Int start, Vector2Int end)
         {
-            var ret = new List<Vector2Int> {start}; // list of the coordinates of the steps
+            var interpolated = new List<Vector2Int> {start}; // list of the coordinates of the steps
 
             var targetAngle = AngleOf(start, end); // determining angle of the diagonal line to approximate
 
@@ -289,24 +289,21 @@ namespace LogicGateSimulator
             var signX = Mathf.RoundToInt(Mathf.Sign((end.x - start.x))); // which direction steps
             var signY = Mathf.RoundToInt(Mathf.Sign((end.y - start.y))); // go in (up down left right)
 
-            for (var i = 0; i < steps; i++)
+            for (var index = 0; index < steps; index++)
             {
-                // stepping and incrementing
-                var last = ret[ret.Count - 1];
-                var vStep = new Vector2Int(last.x, last.y + signY); // computing both possible steps
-                var hStep = new Vector2Int(last.x + signX, last.y);
+                var last = interpolated[interpolated.Count - 1];
+                var verticalStep = new Vector2Int(last.x, last.y + signY);
+                var horizontalStep = new Vector2Int(last.x + signX, last.y);
 
-                // the angle formed when the last coordinate is incremented by a vertical step
-                var vAngle = AngleOf(start, vStep);
-                // the angle formed when the last coordinate is incremented by a horizontal step
-                var hAngle = AngleOf(start, hStep);
+                var verticalAngle = AngleOf(start, verticalStep);
+                var horizontalAngle = AngleOf(start, horizontalStep);
 
                 // add the step that will bring us closer to the target angle
-                ret.Add(Mathf.Abs(vAngle - targetAngle) < Mathf.Abs(hAngle - targetAngle) ? vStep : hStep);
+                interpolated.Add(Mathf.Abs(verticalAngle - targetAngle) < Mathf.Abs(horizontalAngle - targetAngle) ? verticalStep : horizontalStep);
             }
 
-            ret.RemoveAt(0); // removing starting coordinate
-            return ret;
+            interpolated.RemoveAt(0); // removing starting coordinate
+            return interpolated;
         }
 
         private Vector2Int ClampedVectorInBounds(Vector2Int vector)
@@ -320,11 +317,6 @@ namespace LogicGateSimulator
         private bool IsWithinBounds(Vector2Int vector)
         {
             return vector.Equals(ClampedVectorInBounds(vector));
-        }
-
-        public static SimulationManager Sim()
-        {
-            return _instance;
         }
     }
 }
