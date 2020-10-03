@@ -11,10 +11,10 @@ namespace LogicGateSimulator
     public class SimulationManager : MonoBehaviour
     {
         private const int MaxMouseInputColliders = 7;
-        public WireBehavior WirePrefabBehavior;
-        public LedBehavior LedPrefabBehavior;
-        public SwitchBehavior SwitchPrefabBehavior;
-        public ButtonBehavior ButtonPrefabBehavior;
+        [SerializeField] private WireBehavior wirePrefabBehavior;
+        [SerializeField] private LedBehavior ledPrefabBehavior;
+        [SerializeField] private SwitchBehavior switchPrefabBehavior;
+        [SerializeField] private ButtonBehavior buttonPrefabBehavior;
         private List<WireBehavior> _wiresInPath;
         private List<Vector2Int> _wirePath;
         public bool DrawingWirePath;
@@ -23,8 +23,8 @@ namespace LogicGateSimulator
         private Collider2D[] _mouseInputColliders;
         private PartBehavior _hoveringPart;
         private List<PartBehavior> _selectedParts;
-        [SerializeField] private Camera _mainCamera;
-        public Camera MainCamera => _mainCamera;
+        [SerializeField] private Camera mainCamera;
+        public Camera MainCamera => mainCamera;
         public event Action<PartBehavior> MouseDownOnPart;
         public event Action<PartBehavior> MouseUpOnPart;
         public event Action<PartBehavior> MouseHoverOverPart;
@@ -72,7 +72,7 @@ namespace LogicGateSimulator
                 _selectedPart = "";
             }
             
-            var temp = _mainCamera.ScreenToWorldPoint(Input.mousePosition);
+            var temp = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             var mouseCoordinates = new Vector2Int(Mathf.RoundToInt(temp.x), Mathf.RoundToInt(temp.y));
             mouseCoordinates = ClampedVectorInBounds(mouseCoordinates); // force clamp
             if (Input.GetMouseButtonDown(0))
@@ -88,13 +88,13 @@ namespace LogicGateSimulator
 
                         break;
                     case "led":
-                        AddPart(LedPrefabBehavior, mouseCoordinates);
+                        AddPart(ledPrefabBehavior, mouseCoordinates);
                         break;
                     case "switch":
-                        AddPart(SwitchPrefabBehavior, mouseCoordinates);
+                        AddPart(switchPrefabBehavior, mouseCoordinates);
                         break;
                     case "button":
-                        AddPart(ButtonPrefabBehavior, mouseCoordinates);
+                        AddPart(buttonPrefabBehavior, mouseCoordinates);
                         break;
                 }
             }
@@ -123,7 +123,7 @@ namespace LogicGateSimulator
                                 _wirePath.Add(wireCoordinate);
                                 var start = _wirePath[_wirePath.Count - 2];
                                 var end = _wirePath[_wirePath.Count - 1];
-                                var wireBehavior = Instantiate(WirePrefabBehavior, ToVector3(start),
+                                var wireBehavior = Instantiate(wirePrefabBehavior, ToVector3(start),
                                     Quaternion.identity);
                                 wireBehavior.enabled = true;
                                 wireBehavior.PartObject = new Wire(start, end);
@@ -152,7 +152,7 @@ namespace LogicGateSimulator
         {
             var mouseDown = Input.GetMouseButtonDown(0);
             
-            var size = Physics2D.OverlapPointNonAlloc(_mainCamera.ScreenToWorldPoint(Input.mousePosition), _mouseInputColliders);
+            var size = Physics2D.OverlapPointNonAlloc(mainCamera.ScreenToWorldPoint(Input.mousePosition), _mouseInputColliders);
             if (_mouseInputColliders.Length == 0) return;
             
             PartBehavior lastPartBehavior = null;
@@ -186,15 +186,19 @@ namespace LogicGateSimulator
                 return;
             }
             var partObject = partBehavior.PartObject;
-            if (partObject.Active && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                partObject.State = !partObject.State;
+                if (partObject.Active) partObject.State = !partObject.State;
+            }
+            else if (_selectedPart == "")
+            {
+                SelectPart(partBehavior);
             }
         }
 
         private void OnMouseUpPart(PartBehavior partBehavior)
         {
-            if (partBehavior != null && _selectedPart == "") SelectPart(partBehavior);
+            
         }
 
         private void OnMouseHoverPart(PartBehavior partBehavior)
