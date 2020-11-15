@@ -1,46 +1,59 @@
-﻿using System.Collections.Generic;
-using LogicGateSimulator.Parts;
-using UnityEngine;
-
+﻿
 namespace LogicGateSimulator.Circuits
 {
     public class Circuit
     {
-        private readonly PartGrid _partGrid;
-
-        public int GridWidth
+        private StateIds[] circuitState;
+        private struct StateIds
         {
-            get;
+            public bool state;
+            public int[][] andIds;
+            public int[][] orIds;
+            public int[][] notIds;
+            // public int[] xorIds;
         }
 
-        public int GridHeight
+        public void EvaluateCircuit()
         {
-            get;
+            for (int index = 0; index < circuitState.Length; index++)
+            {
+                circuitState[index].state = EvaluateId(index);
+            }
         }
 
-        private void PartStateChanged(Part part)
+        private bool EvaluateId(int id)
         {
-            if (!part.Active) return;
-            _partGrid.SetPartsOfId(part.Id, part.State);
+            var stateIds = circuitState[id];
+            var andEvaluation = true;
+            if (!stateIds.state)
+            {
+                foreach (var orId in stateIds.orIds)
+                {
+                    if (circuitState[orId].state)
+                        return true;
+                }
+
+                foreach (var andId in stateIds.andIds) // incorrect evaluation, evaluate in pairs (A, B)
+                {
+                    if (!circuitState[andId].state)
+                    {
+                        andEvaluation = false;
+                        break;
+                    }
+                }
+
+                if (andEvaluation) return true;
+                
+                foreach (var notId in stateIds.notIds)
+                {
+                    if (!circuitState[notId].state)
+                        return true;
+                }
+                
+                
+                return false;
+            }
         }
         
-        public Circuit(int gridWidth, int gridHeight)
-        {
-            GridWidth = gridWidth;
-            GridHeight = gridHeight;
-            _partGrid = new PartGrid(gridWidth, gridHeight);
-        }
-
-        public void AddWires(List<Wire> wires, List<Vector2Int> wirePathCoordinates)
-        {
-            wires.ForEach(wire => wire.StateChanged += PartStateChanged);
-            _partGrid.AddWires(wires, wirePathCoordinates);
-        }
-
-        public void AddPart(Part part)
-        {
-            part.StateChanged += PartStateChanged;
-            _partGrid.AddPart(part);
-        }
     }
 }
