@@ -1,59 +1,63 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using TMPro;
+using UnityEditorInternal;
+
 namespace LogicGateSimulator.Circuits
 {
     public class Circuit
     {
-        private StateIds[] circuitState;
-        private struct StateIds
+        public IdState[] circuitState;
+
+        public enum GateType
         {
-            public bool state;
-            public int[][] andIds;
-            public int[][] orIds;
-            public int[][] notIds;
-            // public int[] xorIds;
+            And,
+            Or,
+            Not,
+            Xor
         }
 
-        public void EvaluateCircuit()
+        public void EvaluateCircuit() // can lead to race conditions
         {
-            for (int index = 0; index < circuitState.Length; index++)
+            for (var index = 0; index < circuitState.Length; index++)
             {
-                circuitState[index].state = EvaluateId(index);
+                circuitState[index].State = EvaluateId(index);
             }
         }
 
-        private bool EvaluateId(int id)
+        private bool EvaluateId(int id) // should this return IF the value changed instead of the value?
         {
-            var stateIds = circuitState[id];
-            var andEvaluation = true;
-            if (!stateIds.state)
+            var idState = circuitState[id];
+
+            foreach (var gate in idState.LogicGates)
             {
-                foreach (var orId in stateIds.orIds)
+                if (EvaluateGate(gate))
                 {
-                    if (circuitState[orId].state)
-                        return true;
+                    idState.State = true;
+                    return true;
                 }
+            }
 
-                foreach (var andId in stateIds.andIds) // incorrect evaluation, evaluate in pairs (A, B)
-                {
-                    if (!circuitState[andId].state)
-                    {
-                        andEvaluation = false;
-                        break;
-                    }
-                }
+            // found no true values, therefore false
+            idState.State = false;
+            return false;
+        }
 
-                if (andEvaluation) return true;
-                
-                foreach (var notId in stateIds.notIds)
-                {
-                    if (!circuitState[notId].state)
-                        return true;
-                }
-                
-                
-                return false;
+        private bool EvaluateGate(IdState.Gate gate)
+        {
+            switch (gate.GateType)
+            {
+                case GateType.And:
+                    return circuitState[gate.AId].State & circuitState[gate.BId].State;
+                case GateType.Or:
+                    return circuitState[gate.AId].State | circuitState[gate.BId].State;
+                case GateType.Not:
+                    return !circuitState[gate.AId].State;
+                case GateType.Xor:
+                    return circuitState[gate.AId].State ^ circuitState[gate.BId].State;
+                default:
+                    return false;
             }
         }
-        
     }
 }

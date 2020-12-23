@@ -19,7 +19,7 @@ namespace LogicGateSimulator
         private List<Vector2Int> _wirePath;
         public bool DrawingWirePath;
         private string _selectedPart;
-        private Circuit _currentCircuit;
+        private DiscreteCircuit _currentCircuit;
         private Collider2D[] _mouseInputColliders;
         private PartBehavior _hoveringPart;
         private List<PartBehavior> _selectedParts;
@@ -46,7 +46,7 @@ namespace LogicGateSimulator
             DrawingWirePath = false;
             _selectedPart = "";
             _selectedParts = new List<PartBehavior>();
-            _currentCircuit = new Circuit(GridController.Width, GridController.Height);
+            _currentCircuit = new DiscreteCircuit(GridController.Width, GridController.Height);
             _mouseInputColliders = new Collider2D[MaxMouseInputColliders];
 
             MouseDownOnPart += OnMouseDownPart;
@@ -250,7 +250,7 @@ namespace LogicGateSimulator
             return _selectedParts;
         }
 
-        public Circuit GetCircuit()
+        public DiscreteCircuit GetCircuit()
         {
             return _currentCircuit;
         }
