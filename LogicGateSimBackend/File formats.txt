@@ -1,0 +1,60 @@
+###
+Chip file format
+
+The file is text with entries on new lines
+
+Main file sections:
+Header
+Pins
+Chips
+
+--Header--
+Starts wtih the version of the file fornmat
+v:[version number]
+
+Example:
+v:2
+
+On the next line includes the name of the chip
+This should be capitalized and PascalCase
+
+Example:
+4 Bit Full Adder
+--
+
+--Pins--
+Starts with the pin section identifier, plus the pin number count
+This is then followed by n lines of a single integer which is the
+id of the pinState that the pin is connected to. The pin name may
+be optionally written before the pin state id.
+
+Example:
+Pins:2
+Clock:1
+3
+
+The above example shows that the chip contains two pins, and that
+the pin at index 0 is connected to pinState of index 1, and the 
+pin at index 1 is connected to the pinState of index 3
+--
+
+--Chips--
+Starts with the chip section identifier, plus the chip number count
+This is followed by the chip name, followed by lines containing the
+id of the pinstate that the chip's pin is connected to. The pin name
+may be optionally written before the pin state id. This name will
+override the pin name set internally in the chip definition file.
+
+Example:
+Chips:2
+AndGate
+Output:1
+A:2
+B:3
+OrGate
+0
+1
+3
+--
+
+###
